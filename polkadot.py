@@ -1612,9 +1612,38 @@ def join_w_form_app(form_name, form_role, form_email, form_project, form_website
 
 
 
-def suggestion(message, network):
-    message = f'** NEW SUGGESTION / BUG **\n\nNetwork: {network}\nSuggestion: {message}'
+def suggestion(message, network, email, suggest_type):
+
+    message = f'** NEW {suggest_type} **\n\nNetwork: {network}\n' \
+              f'Type: {suggest_type}\n' \
+              f'Email: {email}\n' \
+              f'Suggestion: {message}'
     requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_core}&text={message}')
+
+    def suggest_email(email, suggest_type):
+        try:
+            body = f'\n\nHey there !\n\n' \
+                   f'Thank you very much for reporting the {suggest_type}, we will look into it.\n' \
+                   f'\nHope you have a great day and thanks again, \nWallety.org Auto Reply'
+            subject = f'Wallety.org | {suggest_type}'
+            import smtplib
+            smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
+            smtpserver.ehlo()
+            smtpserver.starttls()
+            smtpserver.ehlo()
+            smtpserver.login(email_user, email_pass)
+            header = 'To:' + email + '\n' + 'From: ' + email_user + '\n' + f'Subject:{subject} \n'
+            msg = header + f'{body}'
+            smtpserver.sendmail(email_user, email, msg)
+            smtpserver.quit()
+            return None
+        except:
+            return None
+            pass
+
+    if email != False:
+        suggest_email(email, suggest_type)
+
     return None
 
 
@@ -2299,14 +2328,12 @@ def suggestion_form():
     try:
         message = str(request.args.get('suggestion'))
         network = str(request.args.get('network'))
-        suggestion(message, network)
+        email = str(request.args.get('suggest_email'))
+        suggest_type = str(request.args.get('suggest_type'))
+        suggestion(message, network, email, suggest_type)
         return {'wallety_org_suggest_bug_server_status': 200, 'response': True}
     except:
         return {'wallety_org_suggest_bug_server_status': 500, 'response': 'internal server error, please try again later'}
-
-
-
-
 # POLKADOT ###############################################################################################################################################################
 # polkadot data ##########################################################################################################################################################
 @app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
