@@ -17,9 +17,7 @@ telegram_chat_id_core = os.getenv('telegram_chat_id_core')
 email_user = os.getenv('email_user')
 email_pass = os.getenv('email_pass')
 hashing_key = os.getenv('hashing_key')
-
 test_wallet_address_polkadot = os.getenv('test_wallet_address_polkadot')
-print(test_wallet_address_polkadot)
 
 # random functions###############################################################################################################################################################################
 
@@ -2283,6 +2281,15 @@ def wallet_check(wallet_address):
         if kusama_check == 'kusama':
             network = 'kusama'
     return {'wallet_network': network}
+
+
+
+# DEV TEST PRINTING #######################################################################################################################################################
+
+
+
+# json_data = json.dumps(polkadot_data(test_wallet_address_polkadot, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+# print(json_data)
 
 
 
