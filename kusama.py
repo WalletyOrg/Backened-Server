@@ -5,15 +5,21 @@ import json
 import decimal
 import time
 
+# ENV
+from dotenv import load_dotenv
+import os
+load_dotenv()
 # Keys
-subscan_api_key = ''
-telegram_api_key = ''
-telegram_chat_id_report = ''
-telegram_chat_id_core = ''
-email_user = ''
-email_pass = ''
-hashing_key = ''
+subscan_api_key = os.getenv('subscan_api_key')
+telegram_api_key = os.getenv('telegram_api_key')
+telegram_chat_id_report = os.getenv('telegram_chat_id_report')
+telegram_chat_id_core = os.getenv('telegram_chat_id_core')
+email_user = os.getenv('email_user')
+email_pass = os.getenv('email_pass')
+hashing_key = os.getenv('hashing_key')
 
+test_wallet_address_kusama = os.getenv('test_wallet_address_kusama')
+print(test_wallet_address_kusama)
 
 # random functions###############################################################################################################################################################################
 
