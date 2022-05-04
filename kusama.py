@@ -14,6 +14,7 @@ subscan_api_key = os.getenv('subscan_api_key')
 telegram_api_key = os.getenv('telegram_api_key')
 telegram_chat_id_report = os.getenv('telegram_chat_id_report')
 telegram_chat_id_core = os.getenv('telegram_chat_id_core')
+telegram_chat_id_report_clean = os.getenv('telegram_chat_id_report_clean')
 email_user = os.getenv('email_user')
 email_pass = os.getenv('email_pass')
 hashing_key = os.getenv('hashing_key')
@@ -1667,6 +1668,8 @@ def report_analytic(network, wallet_address, display_name):
         message = {'new_wallet_request': {'hashing_key_start': hashing_key, 'display_name': display_name, 'wallet_address': wallet_address,
                                           'network': network, 'date': current_dates(), 'hashing_key_end': hashing_key}}
         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report}&text={message}')
+        clean_message = f'{display_name}\n{network}\n{wallet_address}'
+        requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None
     except:
         return None
