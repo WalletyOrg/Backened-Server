@@ -1,2 +1,1 @@
-# Ignoring API keys
-keys.env
+.env
