@@ -1,5 +1,6 @@
 ################################################################################################################################################################################
 import datetime
+import pprint
 import requests
 import json
 import decimal
@@ -15,6 +16,7 @@ telegram_api_key = os.getenv('telegram_api_key')
 telegram_chat_id_report = os.getenv('telegram_chat_id_report')
 telegram_chat_id_core = os.getenv('telegram_chat_id_core')
 telegram_chat_id_report_clean = os.getenv('telegram_chat_id_report_clean')
+telegram_chat_id_website_hits = os.getenv('telegram_chat_id_website_hits')
 email_user = os.getenv('email_user')
 email_pass = os.getenv('email_pass')
 hashing_key = os.getenv('hashing_key')
@@ -29,11 +31,8 @@ def current_dates():
     time = now.strftime('%I:%M:%S %p')
     time = str(time) + ' (BST)'
     date = date + ' ' + time
-
     short_date = now.strftime('%d-%m-%Y')
     return {'date': date, 'short_date': short_date}
-
-
 def current_dates_short():
     import datetime
     now = datetime.datetime.now()
@@ -43,7 +42,6 @@ def current_dates_short():
 
 
 def decimal_number_formatter(number):
-
     if decimal.Decimal(number) != 0:
         coin_length = 12
         balance = str(number)
@@ -81,9 +79,6 @@ def format_dollars(dollars):
         return str(dollars)
     else:
         return 0
-
-
-
 # format new dollars longer
 def format_dollars_longer(dollars):
     if decimal.Decimal(dollars) != 0:
@@ -104,13 +99,10 @@ def format_dollars_longer(dollars):
 
 
 
-
-
-
 # format coins
 def format_coins(coins):
     try:
-        if decimal.Decimal(coins) != 0:
+        if decimal.Decimal(coins) != 0 and decimal.Decimal(coins) >= decimal.Decimal(0.0001):
             coins = str(coins)
             point = 0
             for i in coins:
@@ -118,17 +110,31 @@ def format_coins(coins):
                     point += 1
                 elif i == '.':
                     break
-            coins = str(coins)[:point + 5]
+            coins = coins[:point + 5]
             coins = format(float(coins), ",")
             coins = str(coins) + ' KSM'
             return str(coins)
-
         else:
             return '0 KSM'
     except:
-        temp = str(coins)[:5]
-        return f'{temp} KSM'
-
+        return f'{coins} KSM'
+# formatting machine coins
+def format_coins_machine(coins):
+    try:
+        if decimal.Decimal(coins) != 0 and decimal.Decimal(coins) >= decimal.Decimal(0.0001):
+            coins = str(coins)
+            point = 0
+            for i in coins:
+                if i != '.':
+                    point += 1
+                elif i == '.':
+                    break
+            coins = coins[:point + 5]
+            return float(coins)
+        else:
+            return 0
+    except:
+        return float(coins)
 # format coins longer
 def format_coins_longer(coins):
     if decimal.Decimal(coins) != 0:
@@ -145,6 +151,9 @@ def format_coins_longer(coins):
 
     else:
         return '0 KSM'
+
+
+
 
 
 
@@ -207,19 +216,15 @@ def kusama_first_txn_dates(transfers):
             day_message = '(1 day ago)'
         else:
             day_message = '({} days ago)'.format(days_since)
-
         return {'first_txn_full_date': first_txn_full_date, 'days_since': day_message}
-
     except IndexError:
         return {'first_txn_full_date': '-', 'days_since': '-'}
-
 # timestamp converter
 def kusama_timestamp_converter(block_timestamp):
     from datetime import datetime
     full_date = datetime.fromtimestamp(block_timestamp)
     date = full_date.strftime("%d/%m/%Y")
     return date
-
 # timestamp seconds converter
 def timestamp_converter_seconds(block_timestamp):
     from datetime import datetime
@@ -227,7 +232,6 @@ def timestamp_converter_seconds(block_timestamp):
     date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
     date = str(date) + ' (BST)'
     return date
-
 def raw_transfer_format_timestamp(timestamp):
     try:
         from datetime import datetime, date
@@ -246,23 +250,16 @@ def raw_transfer_format_timestamp(timestamp):
         # calculating days_since since
         delta = today - first_txn_date
         days_since = delta.days
-
         if days_since == 0:
             day_message = '(today)'
         elif days_since == 1:
             day_message = '(1 day ago)'
         else:
             day_message = '({} days ago)'.format(days_since)
-
         return {'first_txn_full_date': first_txn_full_date, 'days_since': day_message}
-
     except IndexError:
         return {'first_txn_full_date': '-', 'days_since': '-'}
-
-
-
-
-# first txn times
+# last txn times
 def kusama_last_txn_dates(transfers):
     try:
         from datetime import datetime, date
@@ -283,26 +280,23 @@ def kusama_last_txn_dates(transfers):
         # calculating days_since since
         delta = today - last_txn_date
         days_since = delta.days
-
         if days_since == 0:
             day_message = '(today)'
         elif days_since == 1:
             day_message = '(1 day ago)'
         else:
             day_message = '({} days ago)'.format(days_since)
-
         return {'last_txn_full_date': last_txn_full_date, 'days_since': day_message}
-
     except IndexError:
         return {'last_txn_full_date': '-', 'days_since': '-'}
+
+
 
 
 # short wallet name
 def kusama_wallet_short_name(address):
     short_name = '{}...{}'.format(str(address)[:7], str(address)[40:47])
     return short_name
-
-
 
 
 
@@ -347,13 +341,11 @@ def kusama_monthly_stats(all_transfers, wallet_address):
 
     # deposit info's
     monthly_deposit_volume_coins = 0
-
     # withdraw info's
     monthly_withdrawal_volume_coin = 0
 
     monthly_withdrawal_gas_coin = decimal.Decimal(0)
     monthly_withdrawal_failed_gas_coin = decimal.Decimal(0)
-
     monthly_withdrawal_failed_interactions = 0
 
     # organising into deposit and withdraws
@@ -388,11 +380,9 @@ def kusama_monthly_stats(all_transfers, wallet_address):
         # Wallet volume
         monthly_total_volume_coins += float(i['amount'])
 
-
     # fee paid dollar worth
     monthly_withdrawal_failed_gas_dollars = monthly_withdrawal_failed_gas_coin * decimal.Decimal(kusama_price)
     monthly_withdrawal_gas_dollars = monthly_withdrawal_gas_coin * decimal.Decimal(kusama_price)
-
     # deposit, withdrawal and total dollar worth
     monthly_total_volume_dollars = monthly_total_volume_coins * float(kusama_price)
     monthly_deposit_volume_dollars = monthly_deposit_volume_coins * float(kusama_price)
@@ -402,7 +392,6 @@ def kusama_monthly_stats(all_transfers, wallet_address):
     # total
     monthly_total_volume_coins = format_coins(monthly_total_volume_coins)
     monthly_total_volume_dollars = format_dollars(monthly_total_volume_dollars)
-
     # withdrawal
     monthly_withdrawal_volume_coin = format_coins(monthly_withdrawal_volume_coin)
     monthly_withdrawal_volume_dollars = format_dollars(monthly_withdrawal_volume_dollars)
@@ -410,7 +399,6 @@ def kusama_monthly_stats(all_transfers, wallet_address):
     monthly_withdrawal_gas_dollars = format_dollars_longer(monthly_withdrawal_gas_dollars)
     monthly_withdrawal_failed_gas_coin = format_coins_longer(monthly_withdrawal_failed_gas_coin)
     monthly_withdrawal_failed_gas_dollars = format_dollars_longer(monthly_withdrawal_failed_gas_dollars)
-
     # deposit
     monthly_deposit_volume_coins = format_coins(monthly_deposit_volume_coins)
     monthly_deposit_volume_dollars = format_dollars(monthly_deposit_volume_dollars)
@@ -419,7 +407,6 @@ def kusama_monthly_stats(all_transfers, wallet_address):
     monthly_withdrawal_first_txn_date = kusama_first_txn_dates(monthly_withdraws)
     monthly_deposits_first_txn_date = kusama_first_txn_dates(monthly_deposits)
     monthly_total_first_txn_date = kusama_first_txn_dates(monthly_transfers)
-
     # last txn dates
     monthly_withdrawal_last_txn_date = kusama_last_txn_dates(monthly_withdraws)
     monthly_deposits_last_txn_date = kusama_last_txn_dates(monthly_deposits)
@@ -436,7 +423,6 @@ def kusama_monthly_stats(all_transfers, wallet_address):
                               'monthly_dates_title': monthly_dates_title,
                               'monthly_total_first_txn_date': monthly_total_first_txn_date,
                               'monthly_total_last_txn_date': monthly_total_last_txn_date
-
                               },
 
             'monthly_withdrawal': {'monthly_withdrawal_volume_coin': monthly_withdrawal_volume_coin,
@@ -465,7 +451,9 @@ def kusama_monthly_stats(all_transfers, wallet_address):
 
 
 
+
 # paper hand diamond hand###############################################################################################################################################################################
+
 
 
 def kusama_paper_diamond_handed(all_withdrawals, diamond_handed_coins):
@@ -483,13 +471,9 @@ def kusama_paper_diamond_handed(all_withdrawals, diamond_handed_coins):
     paper_handed_coins_dollars = format_dollars(paper_handed_coins_dollars)
 
     # diamond handed
-
     diamond_handed_coins = diamond_handed_coins['diamond_handed_coins']
-
     diamond_handed_coins_dollars = float(kusama_price) * float(diamond_handed_coins)
-
     diamond_handed_coins = format_coins(diamond_handed_coins)
-
     diamond_handed_coins_dollars = format_dollars(diamond_handed_coins_dollars)
 
     return {'handed': {'paper_handed': {'paper_handed_coins': paper_handed_coins,
@@ -505,7 +489,6 @@ def kusama_paper_diamond_handed(all_withdrawals, diamond_handed_coins):
 
 
 def kusama_raw_transfers(all_deposits, all_withdrawals):
-
     deposit_transfers = []
     for i in all_deposits['all_deposits']:
         display_name = kusama_wallet_short_name(i['from'])
@@ -526,7 +509,6 @@ def kusama_raw_transfers(all_deposits, all_withdrawals):
         coin_amount = format_coins(coin_amount)
         gas = format_coins_longer(gas)
 
-
         deposit_transfers.append([f'{display_name} ({full_wallet_address}) deposited {coin_amount} (',
                                   coin_worth_dollar,
                                   f') on {txn_time} {days_since} with a fee of {gas} (',
@@ -535,7 +517,6 @@ def kusama_raw_transfers(all_deposits, all_withdrawals):
 
     if deposit_transfers == []:
         deposit_transfers.append('-')
-
 
 
     withdraw_transfers = []
@@ -567,7 +548,6 @@ def kusama_raw_transfers(all_deposits, all_withdrawals):
                                    gas_dollar_worth,
                                    ')'])
 
-
     if withdraw_transfers == []:
         withdraw_transfers.append('-')
 
@@ -589,7 +569,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
     def kusama_top_accounts(wallet_address, transfers, withdraw_or_deposit):
 
         w_d_indicator = withdraw_or_deposit
-
         if withdraw_or_deposit == "withdraw":
             withdraw_or_deposit = 'to'
             account_display = 'to_account_display'
@@ -597,9 +576,8 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
             withdraw_or_deposit = 'from'
             account_display = 'from_account_display'
 
-        # pi chart data
+        # unique wallet data
         coin_amount = {}
-        dollar_amount = {}
         fees_coin = {}
         fees_dollars = {}
         interacted_times = {}
@@ -609,18 +587,15 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
         rawFLtxns = {}
 
         for index, i in enumerate(transfers):
-
             if i[withdraw_or_deposit] != wallet_address:
                 # first time add
                 if i[withdraw_or_deposit] not in coin_amount:
                     # only adds coins and dollars if true but gas was paid so its added
                     if i['success'] == True:
                         coin_amount[i[withdraw_or_deposit]] = float(i['amount'])
-                        dollar_amount[i[withdraw_or_deposit]] = float(i['amount']) * float(kusama_price)
                         failed_interacted_times[i[withdraw_or_deposit]] = 0
                     else:
                         coin_amount[i[withdraw_or_deposit]] = float(0)
-                        dollar_amount[i[withdraw_or_deposit]] = float(0)
                         failed_interacted_times[i[withdraw_or_deposit]] = 1
 
                     fees_coin[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee'])
@@ -635,7 +610,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                 else:
                     if i['success'] == True:
                         coin_amount[i[withdraw_or_deposit]] = float(float(coin_amount[i[withdraw_or_deposit]]) + float(i['amount']))
-                        dollar_amount[i[withdraw_or_deposit]] = float(i['amount']) * float(kusama_price)
                         interacted_times[i[withdraw_or_deposit]] += 1
                     else:
                         failed_interacted_times[i[withdraw_or_deposit]] += 1
@@ -644,15 +618,12 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                     fees_coin[i[withdraw_or_deposit]] = fees_coin[i[withdraw_or_deposit]] + decimal_number_formatter(i['fee'])
                     fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(kusama_price)
 
-
-
                 if i[withdraw_or_deposit] not in rawFLtxns:
                     rawFLtxns[i[withdraw_or_deposit]] = [i]
                 else:
                     rawFLtxns[i[withdraw_or_deposit]].append(i)
 
-
-        # pi chart info
+        # unique txn info
         total_coin_volume = 0
         for i in coin_amount.items():
             total_coin_volume += float(i[1])
@@ -660,7 +631,7 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
         coin_pi_chart_percentage = {}
 
         for i in coin_amount.items():
-            coin_pi_chart_percentage[i[0]] = (float(i[1]) / total_coin_volume) * 100
+            coin_pi_chart_percentage[i[0]] = (format_coins_machine(i[1]) / total_coin_volume) * 100
 
         # making the lists
         data = {}
@@ -668,7 +639,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
         for address, coin_amount1 in coin_amount.items():
             i = {f'{w_d_indicator}_address': address,
                  f'{w_d_indicator}_coin_amount': coin_amount1,
-                 f'{w_d_indicator}_dollar_amount': dollar_amount[address],
                  f'{w_d_indicator}_pi_chart_percent': coin_pi_chart_percentage[address],
                  f'{w_d_indicator}_coin_fee': fees_coin[address],
                  f'{w_d_indicator}_coin_fee_dollars': fees_dollars[address],
@@ -677,9 +647,8 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                  f'{w_d_indicator}_display_name': wallet_names[address],
                  'XXX_coin_volume': total_coin_volume
                  }
-
+        # unformatted data
             data[address] = i
-
         unformatted_data = data
 
         # formatted data
@@ -687,7 +656,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
         for address, coin_amount in coin_amount.items():
             i = {f'{w_d_indicator}_address': address,
                  f'{w_d_indicator}_coin_amount': coin_amount,
-                 f'{w_d_indicator}_dollar_amount': dollar_amount[address],
                  f'{w_d_indicator}_pi_chart_percent': coin_pi_chart_percentage[address],
                  f'{w_d_indicator}_coin_fee': fees_coin[address],
                  f'{w_d_indicator}_coin_fee_dollars': fees_dollars[address],
@@ -695,31 +663,26 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                  f'{w_d_indicator}_failed_interaction_times': failed_interacted_times[address],
                  f'{w_d_indicator}_display_name': wallet_names[address]
                  }
-
+            # formatted data
             data[address] = i
 
         return {'data': data}, {f'{w_d_indicator}_unformatted_data': unformatted_data}, {'rawFLtxns': rawFLtxns}
 
     # total top accounts
     def total_top_transfer_accounts(total_deposits, total_withdrawals, monthly_deposits, monthly_withdrawals):
-
         # all_total_transfers
-
         total_deposits = total_deposits['deposit_unformatted_data']
         try:
             first_address = list(total_deposits)[0]
             depositVolume = total_deposits[first_address]['XXX_coin_volume']
         except IndexError:
             depositVolume = 0
-
-
         total_withdrawals = total_withdrawals['withdraw_unformatted_data']
         try:
             first_address = list(total_withdrawals)[0]
             withdrawalsVolume = total_withdrawals[first_address]['XXX_coin_volume']
         except IndexError:
             withdrawalsVolume = 0
-
 
         total_XX = depositVolume + withdrawalsVolume
 
@@ -731,7 +694,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                          'total_coin_fee': decimal.Decimal(i[1]['deposit_coin_fee']),
                                          'total_coin_fee_dollars': decimal.Decimal(i[1]['deposit_coin_fee_dollars']),
                                          'total_display_name': i[1]['deposit_display_name'],
-                                         'total_dollar_amount': float(i[1]['deposit_dollar_amount']),
                                          'total_interaction_times': i[1]['deposit_interaction_times'],
                                          'total_failed_interaction_times': i[1]['deposit_failed_interaction_times'],
                                          'total_pi_chart_percent': i[1]['deposit_pi_chart_percent']
@@ -745,7 +707,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                              'total_coin_fee': decimal.Decimal(i[1]['withdraw_coin_fee']) + dict_transfers['total_coin_fee'],
                                              'total_coin_fee_dollars': decimal.Decimal(i[1]['withdraw_coin_fee_dollars']) + dict_transfers['total_coin_fee_dollars'],
                                              'total_display_name': i[1]['withdraw_display_name'],
-                                             'total_dollar_amount': float(i[1]['withdraw_dollar_amount']) + dict_transfers['total_dollar_amount'],
                                              'total_interaction_times': i[1]['withdraw_interaction_times'] + dict_transfers['total_interaction_times'],
                                              'total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'] + dict_transfers['total_failed_interaction_times'],
                                              }
@@ -755,12 +716,10 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                              'total_coin_fee': i[1]['withdraw_coin_fee'],
                                              'total_coin_fee_dollars': i[1]['withdraw_coin_fee_dollars'],
                                              'total_display_name': i[1]['withdraw_display_name'],
-                                             'total_dollar_amount': i[1]['withdraw_dollar_amount'],
                                              'total_interaction_times': i[1]['withdraw_interaction_times'],
                                              'total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'],
                                              'total_pi_chart_percent': i[1]['withdraw_pi_chart_percent']
                                              }
-
 
         # monthly_total_transfers
         monthly_total_deposits = monthly_deposits['deposit_unformatted_data']
@@ -769,7 +728,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
             monthlyDepositVolume = monthly_total_deposits[first_address]['XXX_coin_volume']
         except IndexError:
             monthlyDepositVolume = 0
-
         monthly_total_withdrawals = monthly_withdrawals['withdraw_unformatted_data']
         try:
             first_address = list(monthly_total_withdrawals)[0]
@@ -787,7 +745,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                              'monthly_total_coin_fee': i[1]['deposit_coin_fee'],
                                              'monthly_total_coin_fee_dollars': i[1]['deposit_coin_fee_dollars'],
                                              'monthly_total_display_name': i[1]['deposit_display_name'],
-                                             'monthly_total_dollar_amount': i[1]['deposit_dollar_amount'],
                                              'monthly_total_interaction_times': i[1]['deposit_interaction_times'],
                                              'monthly_total_failed_interaction_times': i[1]['deposit_failed_interaction_times'],
                                              'monthly_total_pi_chart_percent': i[1]['deposit_pi_chart_percent']
@@ -801,7 +758,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                                  'monthly_total_coin_fee': decimal.Decimal(i[1]['withdraw_coin_fee']) + decimal.Decimal(dict_transfers['monthly_total_coin_fee']),
                                                  'monthly_total_coin_fee_dollars': decimal.Decimal(i[1]['withdraw_coin_fee_dollars']) + decimal.Decimal(dict_transfers['monthly_total_coin_fee_dollars']),
                                                  'monthly_total_display_name': i[1]['withdraw_display_name'],
-                                                 'monthly_total_dollar_amount': i[1]['withdraw_dollar_amount'] + dict_transfers['monthly_total_dollar_amount'],
                                                  'monthly_total_interaction_times': i[1]['withdraw_interaction_times'] + dict_transfers['monthly_total_interaction_times'],
                                                  'monthly_total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'] + dict_transfers['monthly_total_failed_interaction_times'],
                                                  }
@@ -811,49 +767,44 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                                  'monthly_total_coin_fee': i[1]['withdraw_coin_fee'],
                                                  'monthly_total_coin_fee_dollars': i[1]['withdraw_coin_fee_dollars'],
                                                  'monthly_total_display_name': i[1]['withdraw_display_name'],
-                                                 'monthly_total_dollar_amount': i[1]['withdraw_dollar_amount'],
                                                  'monthly_total_interaction_times': i[1]['withdraw_interaction_times'],
                                                  'monthly_total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'],
                                                  'monthly_total_pi_chart_percent': i[1]['withdraw_pi_chart_percent']
                                                  }
 
-
         return {'all_total_transfers': all_total_transfers, 'monthly_total_transfers': monthly_total_transfers, 'total_XX': total_XX, 'monthly_XX': monthly_XX}
 
 
     # some data
-    # total withdrawals + deposits
+    # ALL total deposits
     deposits_data = kusama_top_accounts(wallet_address, all_deposits, 'deposit')
     deposits = deposits_data[0]
     unformatted_deposits = deposits_data[1]
     deposits_rawFLtxns = deposits_data[2]
-
+    # ALL total withdrawals
     withdrawals_data = kusama_top_accounts(wallet_address, all_withdrawals, 'withdraw')
     withdrawals = withdrawals_data[0]
     unformatted_withdrawals = withdrawals_data[1]
     withdrawals_rawFLtxns = withdrawals_data[2]
-
-    # monthly withdrawals + deposits
+    # monthly deposits
     deposits_monthly_data = kusama_top_accounts(wallet_address, monthly_deposits, 'deposit')
     deposits_monthly = deposits_monthly_data[0]
     monthly_unformatted_deposits = deposits_monthly_data[1]
     monthly_deposits_rawFLtxns = deposits_monthly_data[2]
-
+    # monthly withdrawals
     withdrawals_monthly_data = kusama_top_accounts(wallet_address, monthly_withdrawals, 'withdraw')
     withdrawals_monthly = withdrawals_monthly_data[0]
     monthly_unformatted_withdrawals = withdrawals_monthly_data[1]
     monthly_withdrawals_rawFLtxns = withdrawals_monthly_data[2]
 
-
     # total data
     total_data = total_top_transfer_accounts(unformatted_deposits, unformatted_withdrawals,
                                              monthly_unformatted_deposits, monthly_unformatted_withdrawals)
+
     # total total
     total = total_data['all_total_transfers']
     total_XX = total_data['total_XX']
     # total flx
-
-
     total_rawFLtxns = {}
     for i in all_transactions:
         if i['from'] != wallet_address:
@@ -864,7 +815,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
             total_rawFLtxns[i[unique_wd]] = [i]
         else:
             total_rawFLtxns[i[unique_wd]].append(i)
-
     total_rawFLtxns = {'total_rawFLtxns': total_rawFLtxns}
 
 
@@ -872,10 +822,7 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
     monthly_total = total_data['monthly_total_transfers']
     monthly_XX = total_data['monthly_XX']
     # monthly flx
-
-
     monthly_rawFLtxns = {}
-
     for i in monthly_transactions:
         if i['from'] != wallet_address:
             unique_wd = 'from'
@@ -885,7 +832,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
             monthly_rawFLtxns[i[unique_wd]] = [i]
         else:
             monthly_rawFLtxns[i[unique_wd]].append(i)
-
     monthly_rawFLtxns = {'monthly_rawFLtxns': monthly_rawFLtxns}
 
 
@@ -896,24 +842,22 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
         else:
             return 'times'
 
+
     # formatting total deposits data
     deposits_formatted = []
     for i in deposits['data'].items():
         tier = i[1]
-
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
         deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
-        deposit_dollar_amount = format_dollars(tier['deposit_dollar_amount'])
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
         deposit_coin_fee_dollars = format_dollars_longer(tier['deposit_coin_fee_dollars'])
         deposit_interaction_times = tier['deposit_interaction_times']
         deposit_interaction_times_times = time_times(tier['deposit_interaction_times'])
-
         deposit_failed_interaction_times = tier['deposit_failed_interaction_times']
         deposit_failed_interaction_times_times = time_times(tier['deposit_failed_interaction_times'])
-
         deposit_first_txn = kusama_first_txn_dates(deposits_rawFLtxns['rawFLtxns'][tier['deposit_address']])
         first_txn = deposit_first_txn['first_txn_full_date']
         first_days_since = deposit_first_txn['days_since']
@@ -928,7 +872,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                    f') on gas with you and deposited {deposit_interaction_times} {deposit_interaction_times_times} in total, '
                                    f'in which {deposit_failed_interaction_times} {deposit_failed_interaction_times_times} they failed. '
                                    f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
     if deposits_formatted == []:
         deposits_formatted.append('-')
 
@@ -937,20 +880,17 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
     withdrawals_formatted = []
     for i in withdrawals['data'].items():
         tier = i[1]
-
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
         withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
-        withdraw_dollar_amount = format_dollars(tier['withdraw_dollar_amount'])
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
         withdraw_coin_fee_dollars = format_dollars_longer(tier['withdraw_coin_fee_dollars'])
         withdraw_interaction_times = tier['withdraw_interaction_times']
         withdraw_interaction_times_times = time_times(tier['withdraw_interaction_times'])
-
         withdraw_failed_interaction_times = tier['withdraw_failed_interaction_times']
         withdraw_failed_interaction_times_times = time_times(tier['withdraw_failed_interaction_times'])
-
         withdraw_first_txn = kusama_first_txn_dates(withdrawals_rawFLtxns['rawFLtxns'][tier['withdraw_address']])
         first_txn = withdraw_first_txn['first_txn_full_date']
         first_days_since = withdraw_first_txn['days_since']
@@ -965,8 +905,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                       f') on gas doing this and withdrawn {withdraw_interaction_times} {withdraw_interaction_times_times} in total, '
                                       f'in which {withdraw_failed_interaction_times} {withdraw_failed_interaction_times_times} they failed. '
                                       f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
-
     if withdrawals_formatted == []:
         withdrawals_formatted.append('-')
 
@@ -975,20 +913,17 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
     total_formatted = []
     for i in total.items():
         tier = i[1]
-
         total_display_name = tier['total_display_name']
         total_address = tier['total_address']
+        total_dollar_amount = format_dollars(format_coins_machine(tier['total_coin_amount']) * float(kusama_price))
         total_coin_amount = format_coins(tier['total_coin_amount'])
-        total_dollar_amount = format_dollars(tier['total_dollar_amount'])
         total_pi_chart_percent = percentage_format((float(tier['total_coin_amount']) / float(total_XX)) * 100)
         total_coin_fee = format_coins_longer(tier['total_coin_fee'])
         total_coin_fee_dollars = format_dollars_longer(tier['total_coin_fee_dollars'])
         total_interaction_times = tier['total_interaction_times']
         total_interaction_times_times = time_times(tier['total_interaction_times'])
-
         total_failed_interaction_times = tier['total_failed_interaction_times']
         total_failed_interaction_times_times = time_times(tier['total_failed_interaction_times'])
-
         total_first_txn = kusama_first_txn_dates(total_rawFLtxns['total_rawFLtxns'][tier['total_address']])
         first_txn = total_first_txn['first_txn_full_date']
         first_days_since = total_first_txn['days_since']
@@ -1003,31 +938,25 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                 f') on gas and interacted {total_interaction_times} {total_interaction_times_times} in total, '
                                 f'in which {total_failed_interaction_times} {total_failed_interaction_times_times} they failed. '
                                 f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
-
     if total_formatted == []:
         total_formatted.append('-')
-
 
 
     # formatting monthly deposits data
     monthly_deposits_formatted = []
     for i in deposits_monthly['data'].items():
         tier = i[1]
-
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
         deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
-        deposit_dollar_amount = format_dollars(tier['deposit_dollar_amount'])
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
         deposit_coin_fee_dollars = format_dollars_longer(tier['deposit_coin_fee_dollars'])
         deposit_interaction_times = tier['deposit_interaction_times']
         deposit_interaction_times_times = time_times(tier['deposit_interaction_times'])
-
         deposit_failed_interaction_times = tier['deposit_failed_interaction_times']
         deposit_failed_interaction_times_times = time_times(tier['deposit_failed_interaction_times'])
-
         deposit_first_txn = kusama_first_txn_dates(monthly_deposits_rawFLtxns['rawFLtxns'][tier['deposit_address']])
         first_txn = deposit_first_txn['first_txn_full_date']
         first_days_since = deposit_first_txn['days_since']
@@ -1042,29 +971,25 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                            f') on gas with you and deposited {deposit_interaction_times} {deposit_interaction_times_times} this month, '
                                            f'in which {deposit_failed_interaction_times} {deposit_failed_interaction_times_times} they failed. '
                                            f'Your first transaction with them this month was {first_txn} {first_days_since} and your last transaction with them this month was {last_txn} {last_days_since}.'])
-
-
     if monthly_deposits_formatted == []:
         monthly_deposits_formatted.append('-')
+
 
     # formatting monthly withdrawals data
     monthly_withdrawals_formatted = []
     for i in withdrawals_monthly['data'].items():
         tier = i[1]
-
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
         withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
-        withdraw_dollar_amount = format_dollars(tier['withdraw_dollar_amount'])
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
         withdraw_coin_fee_dollars = format_dollars_longer(tier['withdraw_coin_fee_dollars'])
         withdraw_interaction_times = tier['withdraw_interaction_times']
         withdraw_interaction_times_times = time_times(tier['withdraw_interaction_times'])
-
         withdraw_failed_interaction_times = tier['withdraw_failed_interaction_times']
         withdraw_failed_interaction_times_times = time_times(tier['withdraw_failed_interaction_times'])
-
         withdraw_first_txn = kusama_first_txn_dates(monthly_withdrawals_rawFLtxns['rawFLtxns'][tier['withdraw_address']])
         first_txn = withdraw_first_txn['first_txn_full_date']
         first_days_since = withdraw_first_txn['days_since']
@@ -1079,30 +1004,25 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                               f') on gas doing this and withdrawn {withdraw_interaction_times} {withdraw_interaction_times_times} to them this month, '
                                               f'in which {withdraw_failed_interaction_times} {withdraw_failed_interaction_times_times} they failed. '
                                               f'Your first transaction with them this month was {first_txn} {first_days_since} and your last transaction with them this month was {last_txn} {last_days_since}.'])
-
-
-
     if monthly_withdrawals_formatted == []:
         monthly_withdrawals_formatted.append('-')
+
 
     # formatting monthly total data
     monthly_total_formatted = []
     for i in monthly_total.items():
         tier = i[1]
-
         total_display_name = tier['monthly_total_display_name']
         total_address = tier['monthly_total_address']
+        total_dollar_amount = format_dollars(format_coins_machine(tier['monthly_total_coin_amount']) * float(kusama_price))
         total_coin_amount = format_coins(tier['monthly_total_coin_amount'])
-        total_dollar_amount = format_dollars(tier['monthly_total_dollar_amount'])
         total_pi_chart_percent = percentage_format((float(tier['monthly_total_coin_amount']) / float(monthly_XX)) * 100)
         total_coin_fee = format_coins_longer(tier['monthly_total_coin_fee'])
         total_coin_fee_dollars = format_dollars_longer(tier['monthly_total_coin_fee_dollars'])
         total_interaction_times = tier['monthly_total_interaction_times']
         total_interaction_times_times = time_times(tier['monthly_total_interaction_times'])
-
         total_failed_interaction_times = tier['monthly_total_failed_interaction_times']
         total_failed_interaction_times_times = time_times(tier['monthly_total_failed_interaction_times'])
-
         total_first_txn = kusama_first_txn_dates(monthly_rawFLtxns['monthly_rawFLtxns'][tier['monthly_total_address']])
         first_txn = total_first_txn['first_txn_full_date']
         first_days_since = total_first_txn['days_since']
@@ -1117,9 +1037,6 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                                         f') on gas and interacted {total_interaction_times} {total_interaction_times_times} this month, '
                                         f'in which {total_failed_interaction_times} {total_failed_interaction_times_times} they failed. '
                                         f'Your first transaction with them this month was {first_txn} {first_days_since} and your last transaction with them this month was {last_txn} {last_days_since}.'])
-
-
-
     if monthly_total_formatted == []:
         monthly_total_formatted.append('-')
 
@@ -1136,40 +1053,36 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
 
 def kusama_wallet_profile(wallet_address):
     url = "https://kusama.api.subscan.io/api/v2/scan/search"
-    payload = json.dumps({
-        "key": wallet_address,
-    })
+    payload = json.dumps({"key": wallet_address})
     headers = {
         'Content-Type': 'application/json',
-        'X-API-Key': subscan_api_key
-    }
+        'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
-
+    # identity
     identity = response['data']['account']['account_display']['identity']
     if identity != False:
         identity = True
     else:
         identity = False
-
+    # display name
     display_name = response['data']['account']['account_display']['display']
     if display_name == '':
         display_name = kusama_wallet_short_name(wallet_address)
-
+    # legal name
     try:
         legal_name = response['data']['account']['legal']
     except KeyError:
         legal_name = '-'
     if legal_name == '':
         legal_name = '-'
-
+    # account index
     try:
         account_index = response['data']['account']['account_display']['account_index']
     except KeyError:
         account_index = '-'
     if account_index == '':
         account_index = '-'
-
     # socials
     def url_check(url, social):
         social = str(social)
@@ -1182,39 +1095,36 @@ def kusama_wallet_profile(wallet_address):
         else:
             social = url + social
             return social
-
-
+    # matrix
     try:
         riot = response['data']['account']['riot']
         riot = url_check('https://matrix.to/#/', riot)
     except KeyError:
         riot = ''
-
+    # twitter
     try:
         twitter = response['data']['account']['twitter']
         twitter = url_check('https://www.twitter.com/', twitter)
     except KeyError:
         twitter = ''
-
+    # website
     try:
         website = response['data']['account']['web']
         website = url_check('https://', website)
     except KeyError:
         website = ''
-
+    # email
     try:
         email = response['data']['account']['email']
         email = url_check('mailto:', email)
     except KeyError:
         email = ''
-
     # judgements
     if response['data']['account']['account_display']['judgements'] == None:
         judgements = False
     else:
         judgements = True
-
-    # checking sub
+    # checking if sub account
     if response['data']['account']['account_display']['parent'] == None:
         sub = False
     else:
@@ -1222,28 +1132,25 @@ def kusama_wallet_profile(wallet_address):
     if sub == True:
         display_name = response['data']['account']['account_display']['parent']['display']
 
+    # balances
     total_balance = response['data']['account']['balance']
     locked_balance = response['data']['account']['balance_lock']
-
     reserved_balance = response['data']['account']['reserved']
-
     reserved_balance = decimal_number_formatter(reserved_balance)
     transferable_balance = (float(total_balance) - float(locked_balance)) - float(reserved_balance)
 
-    # balances for handed coins
+    # balances for handed coins later on
     diamond_handed_coins = float(transferable_balance) + float(locked_balance)
 
     # Users role
     def nominator_check(wallet_address):
         headers = {
             'Content-Type': 'application/json',
-            'X-API-Key': subscan_api_key,
-        }
+            'X-API-Key': subscan_api_key}
         json_data = {
             'row': 1,
             'page': 0,
-            'address': wallet_address,
-        }
+            'address': wallet_address}
         response = requests.post('https://kusama.api.subscan.io/api/scan/staking/nominator', headers=headers, json=json_data).text
         response = json.loads(response)
         response = response['data']['staking_info']
@@ -1254,40 +1161,31 @@ def kusama_wallet_profile(wallet_address):
         return role
 
     role = nominator_check(wallet_address)
-
     if role == '':
         role = 'Chain User'
 
-
     def nominator_role_check(address, current_role):
         headers = {
-            'X-API-Key': subscan_api_key,
-        }
+            'X-API-Key': subscan_api_key}
         json_data = {
-            'key': 200,
-        }
+            'key': 200}
         response = requests.post('https://kusama.api.subscan.io/api/scan/staking/validators', headers=headers, json=json_data).text
         response = json.loads(response)
         response = response['data']['list']
 
         current_validators = []
 
-
         for i in response:
             validator_address = i['controller_account_display']['address']
             current_validators.append(validator_address)
             stash_address = i['stash_account_display']['address']
             current_validators.append(stash_address)
-
         if address in current_validators:
             return 'Validator'
-
         else:
             return current_role
 
-
     role = nominator_role_check(wallet_address, role)
-
 
     if response['data']['account']['is_registrar']:
         role = 'Registrar'
@@ -1302,37 +1200,31 @@ def kusama_wallet_profile(wallet_address):
     reserved_balance_dollars = float(reserved_balance) * float(kusama_price)
     transferable_balance_dollars = float(transferable_balance) * float(kusama_price)
 
-
     # formatting numbers
     total_balance = format_coins(total_balance)
     total_balance_dollars = format_dollars(total_balance_dollars)
-
     transferable_balance = format_coins(transferable_balance)
     transferable_balance_dollars = format_dollars(transferable_balance_dollars)
-
     locked_balance = format_coins(locked_balance)
     locked_balance_dollars = format_dollars(locked_balance_dollars)
-
     reserved_balance = format_coins(reserved_balance)
     reserved_balance_dollars = format_dollars(reserved_balance_dollars)
 
-
     # Report analytic
     report_analytic('Kusama', wallet_address, display_name)
-
 
     return {'wallet_profile': {
         'wallet_profile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
                            'role': role,
                            'email': email, 'twitter': twitter, 'website': website, 'riot': riot, 'identity': identity,
                            'judgements': judgements, 'sub': sub},
-
         'balances': {'total_balance': total_balance, 'total_balance_dollars': total_balance_dollars,
                      'transferable_balance': transferable_balance,
                      'transferable_balance_dollars': transferable_balance_dollars, 'locked_balance': locked_balance,
                      'locked_balance_dollars': locked_balance_dollars,
-                     'reserved_balance': reserved_balance, 'reserved_balance_dollars': reserved_balance_dollars}}}, {
-               'diamond_handed_coins': diamond_handed_coins}
+                     'reserved_balance': reserved_balance, 'reserved_balance_dollars': reserved_balance_dollars}}}, \
+           {'diamond_handed_coins': diamond_handed_coins}
+
 
 
 # transfers###############################################################################################################################################################################
@@ -1346,31 +1238,25 @@ def kusama_transfers(wallet_address):
             payload = json.dumps({
                 "address": wallet_address,
                 "row": 100,
-                "page": page
-            })
+                "page": page})
             headers = {
                 'Content-Type': 'application/json',
-                'X-API-Key': subscan_api_key
-            }
+                'X-API-Key': subscan_api_key}
             response = requests.request("POST", url, headers=headers, data=payload).text
             response = json.loads(response)
             return response
 
         all_transfers1 = []
-
         req = all_transfer_req(0)
-
         try:
             all_transfers1.extend(req['data']['transfers'])
         except TypeError:
             all_transfers1 = []
 
-
         transfer_count = float(req['data']['count'])
         pulled_transfer_count = float(len(all_transfers1))
 
         revolving_page = 1
-
         while pulled_transfer_count != transfer_count:
             try:
                 req = all_transfer_req(revolving_page)
@@ -1403,7 +1289,6 @@ def kusama_transfers(wallet_address):
     # withdraw info's
     withdrawal_volume_coins = 0
     total_withdrawal_gas_coins = 0
-
     total_withdrawal_gas_coins_failed = 0
     total_withdrawal_interactions_failed = 0
 
@@ -1465,12 +1350,10 @@ def kusama_transfers(wallet_address):
     # deposits
     total_deposit_volume_coins = format_coins(total_deposit_volume_coins)
     total_deposit_volume_dollars = format_dollars(total_deposit_volume_dollars)
-
     # first txn dates
     withdrawal_first_txn_date = kusama_first_txn_dates(all_withdraws)
     deposits_first_txn_date = kusama_first_txn_dates(all_deposits)
     total_first_txn_date = kusama_first_txn_dates(all_transfers)
-
     # last txn dates
     withdrawal_last_txn_date = kusama_last_txn_dates(all_withdraws)
     deposits_last_txn_date = kusama_last_txn_dates(all_deposits)
@@ -1514,12 +1397,10 @@ def kusama_transfers(wallet_address):
 
 
 
-
 # general###############################################################################################################################################################################
 
 
 def general_kusama():
-
     gecko = requests.get('https://api.coingecko.com/api/v3/coins/kusama').text
     gecko = json.loads(gecko)
     kusama_p_increase = gecko['market_data']['market_cap_change_percentage_24h']
@@ -1533,22 +1414,18 @@ def general_kusama():
     kusama_p_increase = str(kusama_p_increase) + '%'
     if str(kusama_p_increase)[0] != '-':
         kusama_p_increase = '+' + kusama_p_increase
-
     kusama_market_cap = gecko['market_data']['market_cap']['usd']
-
 
     def recent_gas():
         headers = {'X-API-Key': subscan_api_key}
         json_data = {
             'row': 1,
-            'page': 0,
-        }
+            'page': 0,}
         response = requests.post('https://kusama.api.subscan.io/api/scan/transfers', headers=headers, json=json_data)
         response = json.loads(response.text)
 
         transfer_count = response['data']['count']
         transfer_count = format(int(transfer_count), ",")
-
 
         fee = response['data']['transfers'][0]['fee']
         fee = decimal_number_formatter(fee)
@@ -1560,12 +1437,12 @@ def general_kusama():
 
         return {'coin_gas_fee': coin_gas_fee, 'dollar_gas_fee': dollar_gas_fee, 'transfer_count': transfer_count}
 
-    kusama_general = {'kusama_general': {'current_dates': current_dates(),
-                                         'kusama_price': kusamaPrice(),
+    kusama_general_return = {'kusama_general': {'current_dates': current_dates(),
+                                         'kusama_price': float(kusama_price),
                                          'kusama_market_cap': kusama_market_cap,
                                          'recent_gas': recent_gas(),
                                          'kusama_p_increase': kusama_p_increase}}
-    return kusama_general
+    return kusama_general_return
 
 
 
@@ -1578,16 +1455,11 @@ def general_kusama():
 def join_w_form_app(form_name, form_role, form_email, form_project, form_website, form_net, form_comments):
 
     def submit_form_telegram(form_name, form_role, form_email, form_project, form_website, form_net, form_comments):
-
         message = f'** NEW PROJECT SUBMISSION **\n\nTeam Name: {form_project}\nWebsite: {form_website}\nNet: {form_net}\n' \
                   f'Name: {form_name}\nRole: {form_role}\nEmail: {form_email}\nComments: {form_comments}'
-
         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_core}&text={message}')
-
         return None
-
     submit_form_telegram(form_name, form_role, form_email, form_project, form_website, form_net, form_comments)
-
 
     def submit_form_email(form_name, form_email, form_project):
         try:
@@ -1610,7 +1482,6 @@ def join_w_form_app(form_name, form_role, form_email, form_project, form_website
         except:
             return None
             pass
-
     submit_form_email(form_name, form_email, form_project)
 
 
@@ -1620,18 +1491,22 @@ def join_w_form_app(form_name, form_role, form_email, form_project, form_website
 
 
 
-def suggestion(message, network, email, suggest_type):
 
+
+def suggestion(message, network, email, suggest_type):
+    user_message = message
     message = f'** NEW {suggest_type} **\n\nNetwork: {network}\n' \
               f'Type: {suggest_type}\n' \
               f'Email: {email}\n' \
               f'Suggestion: {message}'
     requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_core}&text={message}')
 
-    def suggest_email(email, suggest_type):
+    def suggest_email(email, suggest_type, user_message):
         try:
             body = f'\n\nHey there !\n\n' \
-                   f'Thank you very much for reporting the {suggest_type}, we will look into it.\n' \
+                   f'Thank you very much for reporting the {suggest_type}:\n\n' \
+                   f'\"{user_message}\"\n\n' \
+                   f'We have been notified and will look into it.\n' \
                    f'\nHope you have a great day and thanks again, \nWallety.org Auto Reply'
             subject = f'Wallety.org | {suggest_type}'
             import smtplib
@@ -1650,9 +1525,10 @@ def suggestion(message, network, email, suggest_type):
             pass
 
     if email != False:
-        suggest_email(email, suggest_type)
-
+        suggest_email(email, suggest_type, user_message)
     return None
+
+
 
 
 
@@ -1696,7 +1572,6 @@ def kusama_data(kusama_wallet_address, kusama_wallet_profile, current_dates, kus
                                                                         kusama_transfers_data[1]['all_transfers'],
                                                                         kusama_transfers_data[3]['all_deposits'],
                                                                         kusama_transfers_data[2]['all_withdraws'],
-
                                                                         kusama_monthly_transfers[2]['monthly_deposits'],
                                                                         kusama_monthly_transfers[1]['monthly_withdraws'],
                                                                         kusama_monthly_transfers[3]['monthly_transfers'])
@@ -1711,9 +1586,8 @@ def kusama_data(kusama_wallet_address, kusama_wallet_profile, current_dates, kus
             'current_dates': current_dates,
             'kusama_top_deposit_withdraws': kusama_top_deposit_withdraws,
             'kusama_raw_transfers': kusama_raw_transfers,
+            'general_kusama': general_kusama}
 
-            'general_kusama': general_kusama
-            }
     return data
 
 
@@ -1784,16 +1658,13 @@ def custom_kusama_data(all_transfers, wallet_address, custom_to, custom_from):
     title_to = f'{to_day}/{to_month}/{to_year}'
     custom_dates_title = '(' + str(title_from) + ' - ' + str(title_to) + ')'
 
-
     # custom deposit info's
     custom_deposit_volume_coins = 0
 
     # custom withdraw info's
     custom_withdrawal_volume_coin = 0
-
     custom_withdrawal_gas_coin = decimal.Decimal(0)
     custom_withdrawal_failed_gas_coin = decimal.Decimal(0)
-
     custom_withdrawal_failed_interactions = 0
 
     # organising into deposit and withdraws
@@ -1841,7 +1712,6 @@ def custom_kusama_data(all_transfers, wallet_address, custom_to, custom_from):
     # total
     custom_total_volume_coins = format_coins(custom_total_volume_coins)
     custom_total_volume_dollars = format_dollars(custom_total_volume_dollars)
-
     # withdrawal
     custom_withdrawal_volume_coin = format_coins(custom_withdrawal_volume_coin)
     custom_withdrawal_volume_dollars = format_dollars(custom_withdrawal_volume_dollars)
@@ -1849,16 +1719,13 @@ def custom_kusama_data(all_transfers, wallet_address, custom_to, custom_from):
     custom_withdrawal_gas_dollars = format_dollars(custom_withdrawal_gas_dollars)
     custom_withdrawal_failed_gas_coin = format_coins(custom_withdrawal_failed_gas_coin)
     custom_withdrawal_failed_gas_dollars = format_dollars(custom_withdrawal_failed_gas_dollars)
-
     # deposit
     custom_deposit_volume_coins = format_coins(custom_deposit_volume_coins)
     custom_deposit_volume_dollars = format_dollars(custom_deposit_volume_dollars)
-
     # first txn dates
     custom_withdrawal_first_txn_date = kusama_first_txn_dates(custom_withdraws)
     custom_deposits_first_txn_date = kusama_first_txn_dates(custom_deposits)
     custom_total_first_txn_date = kusama_first_txn_dates(custom_transfers)
-
     # last txn dates
     custom_withdrawal_last_txn_date = kusama_last_txn_dates(custom_withdraws)
     custom_deposits_last_txn_date = kusama_last_txn_dates(custom_deposits)
@@ -1875,7 +1742,6 @@ def custom_kusama_data(all_transfers, wallet_address, custom_to, custom_from):
                              'custom_total_first_txn_date': custom_total_first_txn_date,
                              'custom_total_last_txn_date': custom_total_last_txn_date
                              },
-
             'custom_withdrawal': {'custom_withdrawal_volume_coin': custom_withdrawal_volume_coin,
                                   'custom_withdrawal_volume_dollars': custom_withdrawal_volume_dollars,
                                   'custom_withdrawal_interactions': custom_withdrawal_interactions,
@@ -1887,7 +1753,6 @@ def custom_kusama_data(all_transfers, wallet_address, custom_to, custom_from):
                                   'custom_withdrawal_first_txn_date': custom_withdrawal_first_txn_date,
                                   'custom_withdrawal_last_txn_date': custom_withdrawal_last_txn_date
                                   },
-
             'custom_deposit': {'custom_deposit_volume_coins': custom_deposit_volume_coins,
                                'custom_deposit_volume_dollars': custom_deposit_volume_dollars,
                                'custom_deposit_interactions': custom_deposit_interactions,
@@ -1918,7 +1783,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     def custom_top_accounts(wallet_address, customTransfers, withdraw_or_deposit):
 
         w_d_indicator = withdraw_or_deposit
-
         if withdraw_or_deposit == "withdraw":
             withdraw_or_deposit = 'to'
             account_display = 'to_account_display'
@@ -1928,28 +1792,23 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
 
         # pi chart data
         coin_amount = {}
-        dollar_amount = {}
         fees_coin = {}
         fees_dollars = {}
         interacted_times = {}
         wallet_names = {}
         failed_interacted_times = {}
-
         rawFLtxns = {}
 
         for index, i in enumerate(customTransfers):
-
             if i[withdraw_or_deposit] != wallet_address:
                 # first time add
                 if i[withdraw_or_deposit] not in coin_amount:
                     # only adds coins and dollars if true but gas was paid so its added
                     if i['success'] == True:
                         coin_amount[i[withdraw_or_deposit]] = float(i['amount'])
-                        dollar_amount[i[withdraw_or_deposit]] = float(i['amount']) * float(kusama_price)
                         failed_interacted_times[i[withdraw_or_deposit]] = 0
                     else:
                         coin_amount[i[withdraw_or_deposit]] = float(0)
-                        dollar_amount[i[withdraw_or_deposit]] = float(0)
                         failed_interacted_times[i[withdraw_or_deposit]] = 1
 
                     fees_coin[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee'])
@@ -1964,7 +1823,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                 else:
                     if i['success'] == True:
                         coin_amount[i[withdraw_or_deposit]] = float(float(coin_amount[i[withdraw_or_deposit]]) + float(i['amount']))
-                        dollar_amount[i[withdraw_or_deposit]] = float(i['amount']) * float(kusama_price)
                         interacted_times[i[withdraw_or_deposit]] += 1
                     else:
                         failed_interacted_times[i[withdraw_or_deposit]] += 1
@@ -1974,12 +1832,10 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                     fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(kusama_price)
 
 
-
                 if i[withdraw_or_deposit] not in rawFLtxns:
                     rawFLtxns[i[withdraw_or_deposit]] = [i]
                 else:
                     rawFLtxns[i[withdraw_or_deposit]].append(i)
-
 
         # pi chart info
         total_coin_volume = 0
@@ -1987,7 +1843,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
             total_coin_volume += float(i[1])
 
         coin_pi_chart_percentage = {}
-
         for i in coin_amount.items():
             coin_pi_chart_percentage[i[0]] = (float(i[1]) / total_coin_volume) * 100
 
@@ -1997,7 +1852,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
         for address, coin_amount1 in coin_amount.items():
             i = {f'{w_d_indicator}_address': address,
                  f'{w_d_indicator}_coin_amount': coin_amount1,
-                 f'{w_d_indicator}_dollar_amount': dollar_amount[address],
                  f'{w_d_indicator}_pi_chart_percent': coin_pi_chart_percentage[address],
                  f'{w_d_indicator}_coin_fee': fees_coin[address],
                  f'{w_d_indicator}_coin_fee_dollars': fees_dollars[address],
@@ -2006,9 +1860,7 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                  f'{w_d_indicator}_display_name': wallet_names[address],
                  'XXX_coin_volume': total_coin_volume
                  }
-
             data[address] = i
-
         unformatted_data = data
 
         # formatted data
@@ -2016,7 +1868,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
         for address, coin_amount in coin_amount.items():
             i = {f'{w_d_indicator}_address': address,
                  f'{w_d_indicator}_coin_amount': coin_amount,
-                 f'{w_d_indicator}_dollar_amount': dollar_amount[address],
                  f'{w_d_indicator}_pi_chart_percent': coin_pi_chart_percentage[address],
                  f'{w_d_indicator}_coin_fee': fees_coin[address],
                  f'{w_d_indicator}_coin_fee_dollars': fees_dollars[address],
@@ -2024,7 +1875,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                  f'{w_d_indicator}_failed_interaction_times': failed_interacted_times[address],
                  f'{w_d_indicator}_display_name': wallet_names[address]
                  }
-
             data[address] = i
 
         return {'data': data}, {f'{w_d_indicator}_unformatted_data': unformatted_data}, {'rawFLtxns': rawFLtxns}
@@ -2033,22 +1883,18 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     def total_top_transfer_accounts(total_deposits, total_withdrawals):
 
         # all_total_transfers
-
         total_deposits = total_deposits['deposit_unformatted_data']
         try:
             first_address = list(total_deposits)[0]
             depositVolume = total_deposits[first_address]['XXX_coin_volume']
         except IndexError:
             depositVolume = 0
-
-
         total_withdrawals = total_withdrawals['withdraw_unformatted_data']
         try:
             first_address = list(total_withdrawals)[0]
             withdrawalsVolume = total_withdrawals[first_address]['XXX_coin_volume']
         except IndexError:
             withdrawalsVolume = 0
-
 
         total_XX = depositVolume + withdrawalsVolume
 
@@ -2060,7 +1906,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                          'total_coin_fee': decimal.Decimal(i[1]['deposit_coin_fee']),
                                          'total_coin_fee_dollars': decimal.Decimal(i[1]['deposit_coin_fee_dollars']),
                                          'total_display_name': i[1]['deposit_display_name'],
-                                         'total_dollar_amount': float(i[1]['deposit_dollar_amount']),
                                          'total_interaction_times': i[1]['deposit_interaction_times'],
                                          'total_failed_interaction_times': i[1]['deposit_failed_interaction_times'],
                                          'total_pi_chart_percent': i[1]['deposit_pi_chart_percent']
@@ -2074,7 +1919,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                              'total_coin_fee': decimal.Decimal(i[1]['withdraw_coin_fee']) + dict_transfers['total_coin_fee'],
                                              'total_coin_fee_dollars': decimal.Decimal(i[1]['withdraw_coin_fee_dollars']) + dict_transfers['total_coin_fee_dollars'],
                                              'total_display_name': i[1]['withdraw_display_name'],
-                                             'total_dollar_amount': float(i[1]['withdraw_dollar_amount']) + dict_transfers['total_dollar_amount'],
                                              'total_interaction_times': i[1]['withdraw_interaction_times'] + dict_transfers['total_interaction_times'],
                                              'total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'] + dict_transfers['total_failed_interaction_times'],
                                              }
@@ -2084,7 +1928,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                              'total_coin_fee': i[1]['withdraw_coin_fee'],
                                              'total_coin_fee_dollars': i[1]['withdraw_coin_fee_dollars'],
                                              'total_display_name': i[1]['withdraw_display_name'],
-                                             'total_dollar_amount': i[1]['withdraw_dollar_amount'],
                                              'total_interaction_times': i[1]['withdraw_interaction_times'],
                                              'total_failed_interaction_times': i[1]['withdraw_failed_interaction_times'],
                                              'total_pi_chart_percent': i[1]['withdraw_pi_chart_percent']
@@ -2096,17 +1939,16 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
 
 
     # some data
-    # total withdrawals + deposits
+    # total deposits
     deposits_data = custom_top_accounts(wallet_address, custom_deposits, 'deposit')
     deposits = deposits_data[0]
     unformatted_deposits = deposits_data[1]
     deposits_rawFLtxns = deposits_data[2]
-
+    # total withdrawals
     withdrawals_data = custom_top_accounts(wallet_address, custom_withdrawals, 'withdraw')
     withdrawals = withdrawals_data[0]
     unformatted_withdrawals = withdrawals_data[1]
     withdrawals_rawFLtxns = withdrawals_data[2]
-
 
     # total data
     total_data = total_top_transfer_accounts(unformatted_deposits, unformatted_withdrawals)
@@ -2114,8 +1956,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     total = total_data['all_total_transfers']
     total_XX = total_data['total_XX']
     # total flx
-
-
     total_rawFLtxns = {}
     for i in custom_transactions:
         if i['from'] != wallet_address:
@@ -2129,7 +1969,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
 
     total_rawFLtxns = {'total_rawFLtxns': total_rawFLtxns}
 
-
     # times time function
     def time_times(possible):
         if int(possible) == 1:
@@ -2141,20 +1980,17 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     deposits_formatted = []
     for i in deposits['data'].items():
         tier = i[1]
-
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
         deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
-        deposit_dollar_amount = format_dollars(tier['deposit_dollar_amount'])
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
         deposit_coin_fee_dollars = format_dollars_longer(tier['deposit_coin_fee_dollars'])
         deposit_interaction_times = tier['deposit_interaction_times']
         deposit_interaction_times_times = time_times(tier['deposit_interaction_times'])
-
         deposit_failed_interaction_times = tier['deposit_failed_interaction_times']
         deposit_failed_interaction_times_times = time_times(tier['deposit_failed_interaction_times'])
-
         deposit_first_txn = kusama_first_txn_dates(deposits_rawFLtxns['rawFLtxns'][tier['deposit_address']])
         first_txn = deposit_first_txn['first_txn_full_date']
         first_days_since = deposit_first_txn['days_since']
@@ -2169,7 +2005,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                    f') on gas with you and deposited {deposit_interaction_times} {deposit_interaction_times_times} in total, '
                                    f'in which {deposit_failed_interaction_times} {deposit_failed_interaction_times_times} they failed. '
                                    f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
     if deposits_formatted == []:
         deposits_formatted.append('-')
 
@@ -2178,20 +2013,17 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     withdrawals_formatted = []
     for i in withdrawals['data'].items():
         tier = i[1]
-
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
         withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
-        withdraw_dollar_amount = format_dollars(tier['withdraw_dollar_amount'])
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
         withdraw_coin_fee_dollars = format_dollars_longer(tier['withdraw_coin_fee_dollars'])
         withdraw_interaction_times = tier['withdraw_interaction_times']
         withdraw_interaction_times_times = time_times(tier['withdraw_interaction_times'])
-
         withdraw_failed_interaction_times = tier['withdraw_failed_interaction_times']
         withdraw_failed_interaction_times_times = time_times(tier['withdraw_failed_interaction_times'])
-
         withdraw_first_txn = kusama_first_txn_dates(withdrawals_rawFLtxns['rawFLtxns'][tier['withdraw_address']])
         first_txn = withdraw_first_txn['first_txn_full_date']
         first_days_since = withdraw_first_txn['days_since']
@@ -2206,8 +2038,6 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                       f') on gas doing this and withdrawn {withdraw_interaction_times} {withdraw_interaction_times_times} in total, '
                                       f'in which {withdraw_failed_interaction_times} {withdraw_failed_interaction_times_times} they failed. '
                                       f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
-
     if withdrawals_formatted == []:
         withdrawals_formatted.append('-')
 
@@ -2216,20 +2046,17 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
     total_formatted = []
     for i in total.items():
         tier = i[1]
-
         total_display_name = tier['total_display_name']
         total_address = tier['total_address']
+        total_dollar_amount = format_dollars(format_coins_machine(tier['total_coin_amount']) * float(kusama_price))
         total_coin_amount = format_coins(tier['total_coin_amount'])
-        total_dollar_amount = format_dollars(tier['total_dollar_amount'])
         total_pi_chart_percent = percentage_format((float(tier['total_coin_amount']) / float(total_XX)) * 100)
         total_coin_fee = format_coins_longer(tier['total_coin_fee'])
         total_coin_fee_dollars = format_dollars_longer(tier['total_coin_fee_dollars'])
         total_interaction_times = tier['total_interaction_times']
         total_interaction_times_times = time_times(tier['total_interaction_times'])
-
         total_failed_interaction_times = tier['total_failed_interaction_times']
         total_failed_interaction_times_times = time_times(tier['total_failed_interaction_times'])
-
         total_first_txn = kusama_first_txn_dates(total_rawFLtxns['total_rawFLtxns'][tier['total_address']])
         first_txn = total_first_txn['first_txn_full_date']
         first_days_since = total_first_txn['days_since']
@@ -2244,12 +2071,8 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
                                 f') on gas and interacted {total_interaction_times} {total_interaction_times_times} in total, '
                                 f'in which {total_failed_interaction_times} {total_failed_interaction_times_times} they failed. '
                                 f'Your first transaction with them was {first_txn} {first_days_since} and your last transaction with them was {last_txn} {last_days_since}.'])
-
-
     if total_formatted == []:
         total_formatted.append('-')
-
-
 
 
     return {'all_top_accounts': {'all_deposits': deposits_formatted, 'all_withdrawals': withdrawals_formatted,
@@ -2261,16 +2084,14 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
 # wallet check###############################################################################################################################################################################
 
 
+
 def wallet_check(wallet_address):
     def network_check(network, wallet_address):
         url = f"https://{network}.api.subscan.io/api/v2/scan/search"
-        payload = json.dumps({
-            "key": wallet_address,
-        })
+        payload = json.dumps({"key": wallet_address})
         headers = {
             'Content-Type': 'application/json',
-            'X-API-Key': subscan_api_key
-        }
+            'X-API-Key': subscan_api_key}
         response = requests.request("POST", url, headers=headers, data=payload).text
         response = json.loads(response)
         if response['message'] == 'Record Not Found':
@@ -2292,12 +2113,13 @@ def wallet_check(wallet_address):
 
 
 # json_data = json.dumps(kusama_data(test_wallet_address_kusama, kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama))
+# # pprint.pp(json_data)
 # print(json_data)
 
 
 
 # SERER SETUP #######################################################################################################################################################
-# the whole server
+# The whole server
 from json import dumps
 from flask_cors import CORS
 from flask import *
@@ -2309,11 +2131,15 @@ cors = CORS(app, resources={
     }
 })
 # SERVER ###########################################################################################################################################################
-# home #############################################################################################################################################################
+# Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
 def home():
+    try:
+        requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_website_hits}&text=Hit')
+    except:
+        pass
     return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
-# wallet check #####################################################################################################################################################
+# Wallet check #####################################################################################################################################################
 @app.route('/walletcheck/', methods=['GET'])
 def wallet_check_page():
     try:
@@ -2322,7 +2148,7 @@ def wallet_check_page():
         return json_dump
     except:
         return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
-# join wallety form ##################################################################################################################################################
+# Join wallety form ##################################################################################################################################################
 @app.route('/joinwalletyform/', methods=['GET'])
 def join_w_form():
     try:
@@ -2337,7 +2163,7 @@ def join_w_form():
         return {'wallety_org_join_wallety_server_status': 200, 'response': True}
     except:
         return {'wallety_org_join_wallety_server_status': 500, 'response': 'internal server error, please try again later'}
-# suggest/bug report ##################################################################################################################################################
+# Suggest/bug report ##################################################################################################################################################
 @app.route('/suggestion/', methods=['GET'])
 def suggestion_form():
     try:
@@ -2386,13 +2212,6 @@ def kusama_general():
         return json_dump
     except:
         return {'wallety_org_kusama_general_server_status': 500, 'response': 'internal server error, please try again later'}
-
-
-
-
-
-
-
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
