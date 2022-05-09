@@ -5,6 +5,8 @@ import pprint
 import json
 import decimal
 import time
+from dateutil.tz import gettz
+import datetime as dt
 
 # ENV
 from dotenv import load_dotenv
@@ -27,7 +29,7 @@ test_wallet_address_polkadot = os.getenv('test_wallet_address_polkadot')
 
 
 def current_dates():
-    now = datetime.datetime.now()
+    now = dt.datetime.now(gettz("Europe/London"))
     date = now.strftime('%A %d %B %Y')
     time = now.strftime('%I:%M:%S %p')
     time = str(time) + ' (BST)'
@@ -35,11 +37,9 @@ def current_dates():
     short_date = now.strftime('%d-%m-%Y')
     return {'date': date, 'short_date': short_date}
 def current_dates_short():
-    import datetime
-    now = datetime.datetime.now()
+    now = dt.datetime.now(gettz("Europe/London"))
     date = now.strftime('%d/%m/%Y')
     return date
-
 
 
 def decimal_number_formatter(number):
@@ -1480,7 +1480,7 @@ def join_w_form_app(form_name, form_role, form_email, form_project, form_website
 
     def submit_form_email(form_name, form_email, form_project):
         try:
-            body = f'\n\nHello {form_name} !\n\n' \
+            body = f'\nHello {form_name} !\n\n' \
                    f'Thank you very much for being interested in {form_project} joining Wallety.org, if we are ' \
                    f'interested in going further we will email you back ASAP with a time to meet.\n' \
                    f'\nWe hope you have a great day and thanks again, \nWallety.org Auto Reply'
@@ -1519,7 +1519,7 @@ def suggestion(message, network, email, suggest_type):
 
     def suggest_email(email, suggest_type, user_message):
         try:
-            body = f'\n\nHey there !\n\n' \
+            body = f'\nHey there !\n\n' \
                    f'Thank you very much for reporting the {suggest_type}:\n\n' \
                    f'\"{user_message}\"\n\n' \
                    f'We have been notified and will look into it.\n' \
@@ -1561,7 +1561,7 @@ def api_apply(name, email, comments):
 
     def api_email(name, email):
         try:
-            body = f'\n\nHey {name} !\n\n' \
+            body = f'\nHey {name} !\n\n' \
                    f'Thank you very much for applying for our API, we will let you know once it is live !\n' \
                    f'\nWe hope you have a great day and thanks again, \nWallety.org Auto Reply'
             subject = 'Wallety.org | API'
