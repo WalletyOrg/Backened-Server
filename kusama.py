@@ -17,6 +17,7 @@ telegram_chat_id_report = os.getenv('telegram_chat_id_report')
 telegram_chat_id_core = os.getenv('telegram_chat_id_core')
 telegram_chat_id_report_clean = os.getenv('telegram_chat_id_report_clean')
 telegram_chat_id_website_hits = os.getenv('telegram_chat_id_website_hits')
+telegram_chat_id_api = os.getenv('telegram_chat_id_api')
 email_user = os.getenv('email_user')
 email_pass = os.getenv('email_pass')
 hashing_key = os.getenv('hashing_key')
@@ -1466,7 +1467,7 @@ def join_w_form_app(form_name, form_role, form_email, form_project, form_website
             body = f'\n\nHello {form_name} !\n\n' \
                    f'Thank you very much for being interested in {form_project} joining Wallety.org, if we are ' \
                    f'interested in going further we will email you back ASAP with a time to meet.\n' \
-                   f'\nHope you have a great day and thanks again, \nWallety.org Auto Reply'
+                   f'\nWe hope you have a great day and thanks again, \nWallety.org Auto Reply'
             subject = f'Wallety.org | {form_project}'
             import smtplib
             smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
@@ -1507,7 +1508,7 @@ def suggestion(message, network, email, suggest_type):
                    f'Thank you very much for reporting the {suggest_type}:\n\n' \
                    f'\"{user_message}\"\n\n' \
                    f'We have been notified and will look into it.\n' \
-                   f'\nHope you have a great day and thanks again, \nWallety.org Auto Reply'
+                   f'\nWe hope you have a great day and thanks again, \nWallety.org Auto Reply'
             subject = f'Wallety.org | {suggest_type}'
             import smtplib
             smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
@@ -1527,6 +1528,41 @@ def suggestion(message, network, email, suggest_type):
     if email != False:
         suggest_email(email, suggest_type, user_message)
     return None
+
+
+
+
+
+# API apply ###############################################################################################################################################################################
+
+
+
+def api_apply(name, email, comments):
+    message = {'name': name, 'email': email, 'comments': comments}
+    requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_api}&text={message}')
+
+    def api_email(name, email):
+        try:
+            body = f'\n\nHey {name} !\n\n' \
+                   f'Thank you very much for applying for our API, we will let you know once it is live !\n' \
+                   f'\nWe hope you have a great day and thanks again, \nWallety.org Auto Reply'
+            subject = 'Wallety.org | API'
+            import smtplib
+            smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
+            smtpserver.ehlo()
+            smtpserver.starttls()
+            smtpserver.ehlo()
+            smtpserver.login(email_user, email_pass)
+            header = 'To:' + email + '\n' + 'From: ' + email_user + '\n' + f'Subject:{subject} \n'
+            msg = header + f'{body}'
+            smtpserver.sendmail(email_user, email, msg)
+            smtpserver.quit()
+            return None
+        except:
+            return None
+            pass
+
+    api_email(name, email)
 
 
 
@@ -2175,6 +2211,17 @@ def suggestion_form():
         return {'wallety_org_suggest_bug_server_status': 200, 'response': True}
     except:
         return {'wallety_org_suggest_bug_server_status': 500, 'response': 'internal server error, please try again later'}
+# API wait list ##################################################################################################################################################
+@app.route('/api_apply/', methods=['GET'])
+def apiApply():
+    try:
+        name = str(request.args.get('name'))
+        email = str(request.args.get('email'))
+        comments = str(request.args.get('comments'))
+        api_apply(name, email, comments)
+        return {'wallety_org_api_apply_server_status': 200, 'response': True}
+    except:
+        return {'wallety_org_api_apply_server_status': 500, 'response': 'internal server error, please try again later'}
 # KUSAMA ###############################################################################################################################################################
 # kusama data ##########################################################################################################################################################
 @app.route('/kusama/', methods=['GET']) # http://127.0.0.1:7777/kusama/?wallet_address=
