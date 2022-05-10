@@ -1,6 +1,5 @@
 ################################################################################################################################################################################
 import datetime
-import pprint
 import requests
 import json
 import decimal
@@ -13,17 +12,16 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 # Keys
-subscan_api_key = os.getenv('subscan_api_key')
-telegram_api_key = os.getenv('telegram_api_key')
-telegram_chat_id_report = os.getenv('telegram_chat_id_report')
-telegram_chat_id_core = os.getenv('telegram_chat_id_core')
-telegram_chat_id_report_clean = os.getenv('telegram_chat_id_report_clean')
-telegram_chat_id_website_hits = os.getenv('telegram_chat_id_website_hits')
-telegram_chat_id_api = os.getenv('telegram_chat_id_api')
-email_user = os.getenv('email_user')
-email_pass = os.getenv('email_pass')
-hashing_key = os.getenv('hashing_key')
-test_wallet_address_kusama = os.getenv('test_wallet_address_kusama')
+subscan_api_key = str(os.getenv('subscan_api_key'))
+telegram_api_key = str(os.getenv('telegram_api_key'))
+telegram_chat_id_report = str(os.getenv('telegram_chat_id_report'))
+telegram_chat_id_core = str(os.getenv('telegram_chat_id_core'))
+telegram_chat_id_report_clean = str(os.getenv('telegram_chat_id_report_clean'))
+telegram_chat_id_website_hits = str(os.getenv('telegram_chat_id_website_hits'))
+telegram_chat_id_api = str(os.getenv('telegram_chat_id_api'))
+email_user = str(os.getenv('email_user'))
+email_pass = str(os.getenv('email_pass'))
+hashing_key = str(os.getenv('hashing_key'))
 
 # random functions###############################################################################################################################################################################
 
@@ -2147,7 +2145,8 @@ def wallet_check(wallet_address):
 
 # DEV TEST PRINTING #######################################################################################################################################################
 
-
+# import pprint
+# test_wallet_address_kusama = os.getenv('test_wallet_address_kusama')
 # json_data = json.dumps(kusama_data(test_wallet_address_kusama, kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama))
 # # pprint.pp(json_data)
 # print(json_data)
