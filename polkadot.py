@@ -2170,6 +2170,7 @@ def wallet_check(wallet_address):
 from json import dumps
 from flask_cors import CORS
 from flask import *
+import git
 app = Flask(__name__)
 CORS(app)
 cors = CORS(app, resources={
@@ -2178,6 +2179,15 @@ cors = CORS(app, resources={
     }
 })
 # SERVER ###########################################################################################################################################################
+# Git ###########################################################################################################################################################
+@app.route('/git_update', methods=['post'])
+def git_update():
+    repo = git.Repo('./Backend-Server')
+    origin = repo.remotes.origin
+    repo.create_head('main',
+                     origin.refs.main).set_tracking_branch(origin.refs.main).checkout()
+    origin.pull()
+    return '', 200
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
 def home():
