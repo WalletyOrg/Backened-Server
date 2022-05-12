@@ -1180,8 +1180,7 @@ def polkadot_wallet_profile(wallet_address):
     def nominator_role_check(address, current_role):
         headers = {
             'X-API-Key': subscan_api_key}
-        json_data = {
-            'key': 200}
+        json_data = {}
         response = requests.post('https://polkadot.api.subscan.io/api/scan/staking/validators', headers=headers, json=json_data).text
         response = json.loads(response)
         response = response['data']['list']
