@@ -6,22 +6,7 @@ import decimal
 import time
 from dateutil.tz import gettz
 import datetime as dt
-
-# ENV
-from dotenv import load_dotenv
-import os
-load_dotenv()
-# Keys
-subscan_api_key = str(os.getenv('subscan_api_key'))
-telegram_api_key = str(os.getenv('telegram_api_key'))
-telegram_chat_id_report = str(os.getenv('telegram_chat_id_report'))
-telegram_chat_id_core = str(os.getenv('telegram_chat_id_core'))
-telegram_chat_id_report_clean = str(os.getenv('telegram_chat_id_report_clean'))
-telegram_chat_id_website_hits = str(os.getenv('telegram_chat_id_website_hits'))
-telegram_chat_id_api = str(os.getenv('telegram_chat_id_api'))
-email_user = str(os.getenv('email_user'))
-email_pass = str(os.getenv('email_pass'))
-hashing_key = str(os.getenv('hashing_key'))
+from keys import *
 
 # random functions###############################################################################################################################################################################
 
@@ -2170,9 +2155,10 @@ def wallet_check(wallet_address):
 
 # DEV TEST PRINTING #######################################################################################################################################################
 
-# import pprint
-# test_wallet_address_polkadot = os.getenv('test_wallet_address_polkadot')
+
+
 # json_data = json.dumps(polkadot_data(test_wallet_address_polkadot, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+# # import pprint
 # # pprint.pp(json_data)
 # print(json_data)
 
