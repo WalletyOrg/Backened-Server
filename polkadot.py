@@ -285,6 +285,27 @@ def polkadot_wallet_short_name(address):
 
 
 
+# add to file
+def add_to_file(file, add_dict):
+    def write(filename, data):
+        # write
+        with open(f'{filename}.txt', 'w') as f:
+            import json
+            f.write(json.dumps(data))
+    def read(file):
+        # read
+        with open(f'{file}.txt', 'r') as f:
+            f_contents = f.read()
+            return f_contents
+    contents = read(file)
+    import ast
+    add_dict = str(add_dict)
+    add_dict = ast.literal_eval(add_dict)
+    contents = ast.literal_eval(contents)
+    contents.append(add_dict)
+    write(file, contents)
+
+
 
 
 
@@ -1538,8 +1559,8 @@ def suggestion(message, network, email, suggest_type):
 
 
 def api_apply(name, email, comments):
-    message = {'name': name, 'email': email, 'comments': comments}
-    requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_api}&text={message}')
+    message_clean = f'New API apply\n\nName: {name}\nEmail: {email}\nComments: {comments}'
+    requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_api}&text={message_clean}')
 
     def api_email(name, email):
         try:
@@ -1564,6 +1585,9 @@ def api_apply(name, email, comments):
 
     api_email(name, email)
 
+    message = {'name': name, 'email': email, 'comments': comments}
+    add_to_file('API_waitlist', message)
+
 
 
 
@@ -1584,7 +1608,7 @@ def report_analytic(network, wallet_address, display_name):
     try:
         message = {'new_wallet_request': {'hashing_key_start': hashing_key, 'display_name': display_name, 'wallet_address': wallet_address,
                                           'network': network, 'date': current_dates(), 'hashing_key_end': hashing_key}}
-        requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report}&text={message}')
+        add_to_file('website_requests', message)
         clean_message = f'{display_name}\n{network}\n{wallet_address}'
         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None
