@@ -1,1 +1,1 @@
-[]
+[{"new_wallet_request": {"hashing_key_start": "8iojkjseep2j4np392", "display_name": "Lorimer", "wallet_address": "J6hXKFgZRQRc9Go8gvAwTMAima3Xqwqznz14cfsJ81hWpV3", "network": "Kusama", "date": {"date": "Sunday 15 May 2022 04:41:36 PM (BST)", "short_date": "15-05-2022"}, "hashing_key_end": "8iojkjseep2j4np392"}}]
