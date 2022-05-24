@@ -1172,7 +1172,10 @@ def polkadot_wallet_profile(wallet_address):
             'address': wallet_address}
         response = requests.post('https://polkadot.api.subscan.io/api/scan/staking/nominator', headers=headers, json=json_data).text
         response = json.loads(response)
-        response = response['data']['staking_info']
+        if response['data'] == None:
+            response = None
+        else:
+            response = response['data']['staking_info']
         if response != None:
             role = 'Nominator'
         else:
