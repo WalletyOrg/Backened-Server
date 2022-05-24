@@ -1608,11 +1608,13 @@ def api_apply(name, email, comments):
 
 def report_analytic(network, wallet_address, display_name):
     try:
+        from keys import test_wallet_address_polkadot
         message = {'new_wallet_request': {'display_name': display_name, 'wallet_address': wallet_address,
                                           'network': network, 'date': current_dates()}}
         # add_to_file('website_requests', message)
         clean_message = f'{display_name}\n{network}\n{wallet_address}'
-        requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
+        if wallet_address != test_wallet_address_polkadot:
+            requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None
     except:
         return None
