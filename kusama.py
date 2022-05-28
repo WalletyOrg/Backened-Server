@@ -2188,8 +2188,8 @@ cors = CORS(app, resources={
 @app.route('/git_update/', methods=['POST'])
 def git_update():
     try:
-        from server_git_pull import kusama_server_pull
-        kusama_server_pull()
+        from server_git_pull import server_git_pull
+        server_git_pull()
     except:
         pass
     return 200
@@ -2288,7 +2288,7 @@ def kusama_general():
 # Server test message ##########################################################################################################################################################
 @app.route('/test/', methods=['GET'])
 def test():
-    return 'OK1'
+    return 'OK1', 200
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
