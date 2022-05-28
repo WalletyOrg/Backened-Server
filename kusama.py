@@ -2168,7 +2168,6 @@ def wallet_check(wallet_address):
 # print(json_data)
 
 
-
 # SERER SETUP #######################################################################################################################################################
 # The whole server
 from json import dumps
