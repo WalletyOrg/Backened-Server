@@ -2309,6 +2309,10 @@ def polkadot_general():
         return json_dump
     except:
         return {'wallety_org_polkadot_general_server_status': 500, 'response': 'internal server error, please try again later'}
+# Server test message ##########################################################################################################################################################
+@app.route('/test/', methods=['GET'])
+def test():
+    return 'OK'
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)

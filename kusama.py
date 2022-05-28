@@ -2168,6 +2168,8 @@ def wallet_check(wallet_address):
 # print(json_data)
 
 
+
+
 # SERER SETUP #######################################################################################################################################################
 # The whole server
 from json import dumps
@@ -2183,7 +2185,7 @@ cors = CORS(app, resources={
 })
 # SERVER ###########################################################################################################################################################
 # Github ##########################################################################################################################################################
-@app.route('/git_update', methods=['POST'])
+@app.route('/git_update/', methods=['POST'])
 def git_update():
     try:
         from server_git_pull import kusama_server_pull
@@ -2283,6 +2285,10 @@ def kusama_general():
         return json_dump
     except:
         return {'wallety_org_kusama_general_server_status': 500, 'response': 'internal server error, please try again later'}
+# Server test message ##########################################################################################################################################################
+@app.route('/test/', methods=['GET'])
+def test():
+    return 'OK'
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
