@@ -2175,7 +2175,6 @@ def wallet_check(wallet_address):
 from json import dumps
 from flask_cors import CORS
 from flask import *
-import git
 app = Flask(__name__)
 CORS(app)
 cors = CORS(app, resources={
@@ -2288,7 +2287,7 @@ def kusama_general():
 # Server test message ##########################################################################################################################################################
 @app.route('/test/', methods=['GET'])
 def test():
-    return 'TEST', 200
+    return '1234', 200
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
