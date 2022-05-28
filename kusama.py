@@ -2188,8 +2188,8 @@ cors = CORS(app, resources={
 @app.route('/git_update/', methods=['POST'])
 def git_update():
     try:
-        from server_git_pull import server_git_pull
-        server_git_pull()
+        from server_git_pull import server_git_pull_func
+        server_git_pull_func()
     except:
         pass
     return 200
