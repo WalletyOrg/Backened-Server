@@ -2186,12 +2186,9 @@ cors = CORS(app, resources={
 # Github ##########################################################################################################################################################
 @app.route('/git_update', methods=['POST'])
 def git_update():
-    repo = git.Repo('./Backend-Server')
-    origin = repo.remotes.origin
-    repo.create_head('main',
-                     origin.refs.main).set_tracking_branch(origin.refs.main).checkout()
-    origin.pull()
-    return '', 200
+    from server_git_pull import kusama_server_pull
+    kusama_server_pull()
+    return 200
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
 def home():
