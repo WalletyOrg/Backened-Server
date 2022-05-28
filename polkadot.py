@@ -2211,8 +2211,11 @@ cors = CORS(app, resources={
 # Github ###########################################################################################################################################################
 @app.route('/git_update/', methods=['POST'])
 def git_update():
-    from server_git_pull import polkadot_server_pull
-    polkadot_server_pull()
+    try:
+        from server_git_pull import polkadot_server_pull
+        polkadot_server_pull()
+    except:
+        pass
     return 200
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])

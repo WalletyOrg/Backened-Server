@@ -2186,8 +2186,11 @@ cors = CORS(app, resources={
 # Github ##########################################################################################################################################################
 @app.route('/git_update', methods=['POST'])
 def git_update():
-    from server_git_pull import kusama_server_pull
-    kusama_server_pull()
+    try:
+        from server_git_pull import kusama_server_pull
+        kusama_server_pull()
+    except:
+        pass
     return 200
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
