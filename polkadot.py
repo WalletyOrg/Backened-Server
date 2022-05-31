@@ -649,7 +649,11 @@ def polkadot_top_accounts_withdraw_deposit(wallet_address, all_transactions, all
         coin_pi_chart_percentage = {}
 
         for i in coin_amount.items():
-            coin_pi_chart_percentage[i[0]] = (format_coins_machine(i[1]) / total_coin_volume) * 100
+            # zero div error
+            if str(format_coins_machine(i[1])) == '0':
+                coin_pi_chart_percentage[i[0]] = 0
+            else:
+                coin_pi_chart_percentage[i[0]] = (format_coins_machine(i[1]) / total_coin_volume) * 100
 
         # making the lists
         data = {}
