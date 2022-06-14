@@ -37,7 +37,7 @@ def decimal_number_formatter(number):
             whole_number = balance[:extra_length]
             decimal_number = balance[extra_length:]
             formatted_number = str(whole_number) + '.' + str(decimal_number)
-            return float(formatted_number)
+            return decimal.Decimal(formatted_number)
         else:
             # decimal
             zeros = '0.000000000000'
