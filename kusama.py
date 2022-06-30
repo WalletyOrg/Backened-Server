@@ -500,8 +500,11 @@ def kusama_raw_transfers(all_deposits, all_withdrawals):
     deposit_transfers = []
     for i in all_deposits['all_deposits']:
         display_name = kusama_wallet_short_name(i['from'])
-        if i['from_account_display']['display'] != '':
-            display_name = i['from_account_display']['display']
+        try:
+            if i['from_account_display']['display'] != '':
+                display_name = i['from_account_display']['display']
+        except:
+            pass
         full_wallet_address = i['from']
         coin_amount = i['amount']
         coin_worth_dollar = float(coin_amount) * float(kusama_price)
@@ -533,8 +536,11 @@ def kusama_raw_transfers(all_deposits, all_withdrawals):
         if i['success'] != True:
             withdraw_withdrew = 'TRIED to withdraw'
         display_name = kusama_wallet_short_name(i['to'])
-        if i['to_account_display']['display'] != '':
-            display_name = i['to_account_display']['display']
+        try:
+            if i['to_account_display']['display'] != '':
+                display_name = i['to_account_display']['display']
+        except:
+            pass
         full_wallet_address = i['to']
         coin_amount = i['amount']
         coin_worth_dollar = float(coin_amount) * float(kusama_price)
@@ -610,10 +616,14 @@ def kusama_top_accounts_withdraw_deposit(wallet_address, all_transactions, all_d
                     fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(kusama_price)
                     interacted_times[i[withdraw_or_deposit]] = 1
 
-                    if i[account_display]['identity']:
-                        wallet_names[i[withdraw_or_deposit]] = i[account_display]['display']
-                    else:
+                    try:
+                        if i[account_display]['identity']:
+                            wallet_names[i[withdraw_or_deposit]] = i[account_display]['display']
+                        else:
+                            wallet_names[i[withdraw_or_deposit]] = kusama_wallet_short_name(i[withdraw_or_deposit])
+                    except:
                         wallet_names[i[withdraw_or_deposit]] = kusama_wallet_short_name(i[withdraw_or_deposit])
+
                 # adding onto original value
                 else:
                     if i['success'] == True:
@@ -1133,10 +1143,13 @@ def kusama_wallet_profile(wallet_address):
     else:
         judgements = True
     # checking if sub account
-    if response['data']['account']['account_display']['parent'] == None:
+    try:
+        if response['data']['account']['account_display']['parent'] == None:
+            sub = False
+        else:
+            sub = True
+    except:
         sub = False
-    else:
-        sub = True
     if sub == True:
         display_name = response['data']['account']['account_display']['parent']['display']
 

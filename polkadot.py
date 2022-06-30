@@ -506,8 +506,11 @@ def polkadot_raw_transfers(all_deposits, all_withdrawals):
     deposit_transfers = []
     for i in all_deposits['all_deposits']:
         display_name = polkadot_wallet_short_name(i['from'])
-        if i['from_account_display']['display'] != '':
-            display_name = i['from_account_display']['display']
+        try:
+            if i['from_account_display']['display'] != '':
+                display_name = i['from_account_display']['display']
+        except:
+            pass
         full_wallet_address = i['from']
         coin_amount = i['amount']
         coin_worth_dollar = float(coin_amount) * float(polkadot_price)
@@ -541,8 +544,11 @@ def polkadot_raw_transfers(all_deposits, all_withdrawals):
         if i['success'] != True:
             withdraw_withdrew = 'TRIED to withdraw'
         display_name = polkadot_wallet_short_name(i['to'])
-        if i['to_account_display']['display'] != '':
-            display_name = i['to_account_display']['display']
+        try:
+            if i['to_account_display']['display'] != '':
+                display_name = i['to_account_display']['display']
+        except:
+            pass
         full_wallet_address = i['to']
         coin_amount = i['amount']
         coin_worth_dollar = float(coin_amount) * float(polkadot_price)
@@ -619,9 +625,12 @@ def polkadot_top_accounts_withdraw_deposit(wallet_address, all_transactions, all
                     fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(polkadot_price)
                     interacted_times[i[withdraw_or_deposit]] = 1
 
-                    if i[account_display]['identity']:
-                        wallet_names[i[withdraw_or_deposit]] = i[account_display]['display']
-                    else:
+                    try:
+                        if i[account_display]['identity']:
+                            wallet_names[i[withdraw_or_deposit]] = i[account_display]['display']
+                        else:
+                            wallet_names[i[withdraw_or_deposit]] = polkadot_wallet_short_name(i[withdraw_or_deposit])
+                    except:
                         wallet_names[i[withdraw_or_deposit]] = polkadot_wallet_short_name(i[withdraw_or_deposit])
                 # adding onto original value
                 else:
@@ -1149,10 +1158,13 @@ def polkadot_wallet_profile(wallet_address):
     else:
         judgements = True
     # checking if sub account
-    if response['data']['account']['account_display']['parent'] == None:
+    try:
+        if response['data']['account']['account_display']['parent'] == None:
+            sub = False
+        else:
+            sub = True
+    except:
         sub = False
-    else:
-        sub = True
     if sub == True:
         display_name = response['data']['account']['account_display']['parent']['display']
     # balances
@@ -2189,128 +2201,128 @@ def wallet_check(wallet_address):
 
 
 
-# json_data = json.dumps(polkadot_data(test_wallet_address_polkadot, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
-# # import pprint
-# # pprint.pp(json_data)
-# print(json_data)
+json_data = json.dumps(polkadot_data(test_wallet_address_polkadot, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+# import pprint
+# pprint.pp(json_data)
+print(json_data)
 
 
 
 
-
-# SERER SETUP #######################################################################################################################################################
-# The whole server
-from json import dumps
-from flask_cors import CORS
-from flask import *
-app = Flask(__name__)
-CORS(app)
-cors = CORS(app, resources={
-    r"/*": {
-        "origins": "*"
-    }
-})
-# SERVER ##########################################################################################################################################################
-# Home #############################################################################################################################################################
-@app.route('/', methods=['GET'])
-def home():
-    try:
-        requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_website_hits}&text=Hit')
-    except:
-        pass
-    return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
-# Wallet check #####################################################################################################################################################
-@app.route('/walletcheck/', methods=['GET'])
-def wallet_check_page():
-    try:
-        wallet_address = str(request.args.get('wallet_address'))
-        json_dump = json.dumps(wallet_check(wallet_address))
-        return json_dump
-    except:
-        return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
-# Join wallety form ##################################################################################################################################################
-@app.route('/joinwalletyform/', methods=['GET'])
-def join_w_form():
-    try:
-        form_name = str(request.args.get('form_name'))
-        form_role = str(request.args.get('form_role'))
-        form_email = str(request.args.get('form_email'))
-        form_project = str(request.args.get('form_project'))
-        form_website = str(request.args.get('form_website'))
-        form_net = str(request.args.get('form_net'))
-        form_comments = str(request.args.get('form_comments'))
-        join_w_form_app(form_name, form_role, form_email, form_project, form_website, form_net, form_comments)
-        return {'wallety_org_join_wallety_server_status': 200, 'response': True}
-    except:
-        return {'wallety_org_join_wallety_server_status': 500, 'response': 'internal server error, please try again later'}
-# Suggest/bug report ##################################################################################################################################################
-@app.route('/suggestion/', methods=['GET'])
-def suggestion_form():
-    try:
-        message = str(request.args.get('suggestion'))
-        network = str(request.args.get('network'))
-        email = str(request.args.get('suggest_email'))
-        suggest_type = str(request.args.get('suggest_type'))
-        suggestion(message, network, email, suggest_type)
-        return {'wallety_org_suggest_bug_server_status': 200, 'response': True}
-    except:
-        return {'wallety_org_suggest_bug_server_status': 500, 'response': 'internal server error, please try again later'}
-# API wait list ##################################################################################################################################################
-@app.route('/api_apply/', methods=['GET'])
-def apiApply():
-    try:
-        name = str(request.args.get('name'))
-        email = str(request.args.get('email'))
-        comments = str(request.args.get('comments'))
-        api_apply(name, email, comments)
-        return {'wallety_org_api_apply_server_status': 200, 'response': True}
-    except:
-        return {'wallety_org_api_apply_server_status': 500, 'response': 'internal server error, please try again later'}
-# POLKADOT ###############################################################################################################################################################
-# Polkadot data ##########################################################################################################################################################
-@app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
-def polkadot_request_page():
-    try:
-        wallet_address = str(request.args.get('wallet_address'))
-        json_data = json.dumps(polkadot_data(wallet_address, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
-        return json_data
-    except:
-        return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
-# Custom polkadot data ####################################################################################################################################################
-@app.route('/polkadot/customdata/', methods=['GET'])
-def polkadot_custom_data():
-    try:
-        wallet_address = str(request.args.get('wallet_address'))
-        custom_to = str(request.args.get('to'))
-        custom_from = str(request.args.get('from'))
-        all_transfers_custom = polkadot_transfers(wallet_address)[1]
-        custom_data = custom_polkadot_data(all_transfers_custom, wallet_address, custom_to, custom_from)
-        custom_top_accounts = custom_top_accounts_withdraw_deposit(wallet_address, custom_data[2], custom_data[1], custom_data[3])
-        return_custom = {'custom_data_total': custom_data[0]['custom_total'],
-                         'custom_data_withdrawals': custom_data[0]['custom_withdrawal'],
-                         'custom_data_deposits': custom_data[0]['custom_deposit'],
-                         'custom_top_accounts': custom_top_accounts
-                         }
-        json_data = json.dumps(return_custom)
-        return json_data
-    except:
-        return {'wallety_org_custom_data_server_status': 500, 'response': 'internal server error, please try again later'}
-# Polkadot general ##########################################################################################################################################################
-@app.route('/polkadot/general/', methods=['GET']) # http://127.0.0.1:5000/polkadot/general/
-def polkadot_general():
-    try:
-        json_dump = json.dumps(general_polkadot())
-        return json_dump
-    except:
-        return {'wallety_org_polkadot_general_server_status': 500, 'response': 'internal server error, please try again later'}
-# Server test message ##########################################################################################################################################################
-@app.route('/test/', methods=['GET'])
-def test():
-    return '1234', 200
-# RUN SERVER ##############################################################################################################################################################
-if __name__ == '__main__':
-    app.run(port=7777)
-
-
+#
+# # SERER SETUP #######################################################################################################################################################
+# # The whole server
+# from json import dumps
+# from flask_cors import CORS
+# from flask import *
+# app = Flask(__name__)
+# CORS(app)
+# cors = CORS(app, resources={
+#     r"/*": {
+#         "origins": "*"
+#     }
+# })
+# # SERVER ##########################################################################################################################################################
+# # Home #############################################################################################################################################################
+# @app.route('/', methods=['GET'])
+# def home():
+#     try:
+#         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_website_hits}&text=Hit')
+#     except:
+#         pass
+#     return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
+# # Wallet check #####################################################################################################################################################
+# @app.route('/walletcheck/', methods=['GET'])
+# def wallet_check_page():
+#     try:
+#         wallet_address = str(request.args.get('wallet_address'))
+#         json_dump = json.dumps(wallet_check(wallet_address))
+#         return json_dump
+#     except:
+#         return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
+# # Join wallety form ##################################################################################################################################################
+# @app.route('/joinwalletyform/', methods=['GET'])
+# def join_w_form():
+#     try:
+#         form_name = str(request.args.get('form_name'))
+#         form_role = str(request.args.get('form_role'))
+#         form_email = str(request.args.get('form_email'))
+#         form_project = str(request.args.get('form_project'))
+#         form_website = str(request.args.get('form_website'))
+#         form_net = str(request.args.get('form_net'))
+#         form_comments = str(request.args.get('form_comments'))
+#         join_w_form_app(form_name, form_role, form_email, form_project, form_website, form_net, form_comments)
+#         return {'wallety_org_join_wallety_server_status': 200, 'response': True}
+#     except:
+#         return {'wallety_org_join_wallety_server_status': 500, 'response': 'internal server error, please try again later'}
+# # Suggest/bug report ##################################################################################################################################################
+# @app.route('/suggestion/', methods=['GET'])
+# def suggestion_form():
+#     try:
+#         message = str(request.args.get('suggestion'))
+#         network = str(request.args.get('network'))
+#         email = str(request.args.get('suggest_email'))
+#         suggest_type = str(request.args.get('suggest_type'))
+#         suggestion(message, network, email, suggest_type)
+#         return {'wallety_org_suggest_bug_server_status': 200, 'response': True}
+#     except:
+#         return {'wallety_org_suggest_bug_server_status': 500, 'response': 'internal server error, please try again later'}
+# # API wait list ##################################################################################################################################################
+# @app.route('/api_apply/', methods=['GET'])
+# def apiApply():
+#     try:
+#         name = str(request.args.get('name'))
+#         email = str(request.args.get('email'))
+#         comments = str(request.args.get('comments'))
+#         api_apply(name, email, comments)
+#         return {'wallety_org_api_apply_server_status': 200, 'response': True}
+#     except:
+#         return {'wallety_org_api_apply_server_status': 500, 'response': 'internal server error, please try again later'}
+# # POLKADOT ###############################################################################################################################################################
+# # Polkadot data ##########################################################################################################################################################
+# @app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
+# def polkadot_request_page():
+#     try:
+#         wallet_address = str(request.args.get('wallet_address'))
+#         json_data = json.dumps(polkadot_data(wallet_address, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+#         return json_data
+#     except:
+#         return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+# # Custom polkadot data ####################################################################################################################################################
+# @app.route('/polkadot/customdata/', methods=['GET'])
+# def polkadot_custom_data():
+#     try:
+#         wallet_address = str(request.args.get('wallet_address'))
+#         custom_to = str(request.args.get('to'))
+#         custom_from = str(request.args.get('from'))
+#         all_transfers_custom = polkadot_transfers(wallet_address)[1]
+#         custom_data = custom_polkadot_data(all_transfers_custom, wallet_address, custom_to, custom_from)
+#         custom_top_accounts = custom_top_accounts_withdraw_deposit(wallet_address, custom_data[2], custom_data[1], custom_data[3])
+#         return_custom = {'custom_data_total': custom_data[0]['custom_total'],
+#                          'custom_data_withdrawals': custom_data[0]['custom_withdrawal'],
+#                          'custom_data_deposits': custom_data[0]['custom_deposit'],
+#                          'custom_top_accounts': custom_top_accounts
+#                          }
+#         json_data = json.dumps(return_custom)
+#         return json_data
+#     except:
+#         return {'wallety_org_custom_data_server_status': 500, 'response': 'internal server error, please try again later'}
+# # Polkadot general ##########################################################################################################################################################
+# @app.route('/polkadot/general/', methods=['GET']) # http://127.0.0.1:5000/polkadot/general/
+# def polkadot_general():
+#     try:
+#         json_dump = json.dumps(general_polkadot())
+#         return json_dump
+#     except:
+#         return {'wallety_org_polkadot_general_server_status': 500, 'response': 'internal server error, please try again later'}
+# # Server test message ##########################################################################################################################################################
+# @app.route('/test/', methods=['GET'])
+# def test():
+#     return '1234', 200
+# # RUN SERVER ##############################################################################################################################################################
+# if __name__ == '__main__':
+#     app.run(port=7777)
+#
+#
 
 
