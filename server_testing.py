@@ -17,7 +17,8 @@ def kusama_server_test(wallet_address):
     except Exception as e:
         print(e)
         colour_print(f'{wallet_address[1]} FAILED', RED)
-from keys import test_wallet_address_kusama, test_wallet_address_kusama_ni, test_wallet_address_kusama_wni, test_wallet_address_kusama_wpi
+from keys import test_wallet_address_kusama, test_wallet_address_kusama_ni, test_wallet_address_kusama_wni, \
+    test_wallet_address_kusama_wpi, test_wallet_address_kusama_auac
 # kusama test
 kusama_server_test(test_wallet_address_kusama)
 # kusama ni
@@ -26,6 +27,8 @@ kusama_server_test(test_wallet_address_kusama_ni)
 kusama_server_test(test_wallet_address_kusama_wni)
 # kusama wpi
 kusama_server_test(test_wallet_address_kusama_wpi)
+# kusama auac
+kusama_server_test(test_wallet_address_kusama_auac)
 
 print('\n')
 
@@ -39,7 +42,8 @@ def polkadot_server_test(wallet_address):
     except Exception as e:
         print(e)
         colour_print(f'{wallet_address[1]} FAILED', RED)
-from keys import test_wallet_address_polkadot, test_wallet_address_polkadot_ni, test_wallet_address_polkadot_wni, test_wallet_address_polkadot_wpi
+from keys import test_wallet_address_polkadot, test_wallet_address_polkadot_ni, test_wallet_address_polkadot_wni, \
+    test_wallet_address_polkadot_wpi, test_wallet_address_polkadot_auac
 # polkadot test
 polkadot_server_test(test_wallet_address_polkadot)
 # polkadot ni
@@ -48,4 +52,5 @@ polkadot_server_test(test_wallet_address_polkadot_ni)
 polkadot_server_test(test_wallet_address_polkadot_wni)
 # polkadot wpi
 polkadot_server_test(test_wallet_address_polkadot_wpi)
-
+# polkadot auac
+polkadot_server_test(test_wallet_address_polkadot_auac)

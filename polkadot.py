@@ -2181,8 +2181,7 @@ def custom_top_accounts_withdraw_deposit(wallet_address, custom_deposits, custom
 
 # wallet check###############################################################################################################################################################################
 
-
-def wallet_check(wallet_address):
+def wallet_check(wallet_address, specified_network):
     def network_check(network, wallet_address):
         url = f"https://{network}.api.subscan.io/api/v2/scan/search"
         payload = json.dumps({"key": wallet_address})
@@ -2191,10 +2190,14 @@ def wallet_check(wallet_address):
             'X-API-Key': subscan_api_key}
         response = requests.request("POST", url, headers=headers, data=payload).text
         response = json.loads(response)
+
         if response['message'] == 'Record Not Found':
             return False
         elif response['data']['account']['address'] == wallet_address:
             return network
+        elif response['message'] != 'Record Not Found' and specified_network != 'all':
+            return specified_network
+
     network = False
     polkadot_check = network_check('polkadot', wallet_address)
     if polkadot_check == 'polkadot':
@@ -2203,7 +2206,9 @@ def wallet_check(wallet_address):
         kusama_check = network_check('kusama', wallet_address)
         if kusama_check == 'kusama':
             network = 'kusama'
+
     return {'wallet_network': network}
+
 
 
 
@@ -2239,7 +2244,8 @@ def home():
 def wallet_check_page():
     try:
         wallet_address = str(request.args.get('wallet_address'))
-        json_dump = json.dumps(wallet_check(wallet_address))
+        specified_network = str(request.args.get('specified_network'))
+        json_dump = json.dumps(wallet_check(wallet_address, specified_network))
         return json_dump
     except:
         return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
