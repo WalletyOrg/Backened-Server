@@ -1093,7 +1093,6 @@ def polkadot_wallet_profile(wallet_address):
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
     # identity
-    print(response)
     identity = response['data']['account']['account_display']['identity']
     if identity != False:
         identity = True

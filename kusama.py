@@ -1077,7 +1077,6 @@ def kusama_wallet_profile(wallet_address):
         'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
-    print(response)
     # identity
     identity = response['data']['account']['account_display']['identity']
     if identity != False:
