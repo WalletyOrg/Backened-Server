@@ -1093,6 +1093,7 @@ def polkadot_wallet_profile(wallet_address):
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
     # identity
+    print(response)
     identity = response['data']['account']['account_display']['identity']
     if identity != False:
         identity = True
@@ -2197,14 +2198,7 @@ def wallet_check(wallet_address):
 
 
 
-# DEV TEST PRINTING #######################################################################################################################################################
 
-
-
-# json_data = json.dumps(polkadot_data(test_wallet_address_polkadot, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
-# # import pprint
-# # pprint.pp(json_data)
-# print(json_data)
 
 
 

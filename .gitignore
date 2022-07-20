@@ -6,3 +6,5 @@ __pycache__/keys.cpython-310.pyc
 __pycache__/server_git_pull.cpython-310.pyc
 technical.py
 .env.local
+__pycache__/kusama.cpython-310.pyc
+__pycache__/polkadot.cpython-310.pyc

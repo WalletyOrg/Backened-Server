@@ -1077,6 +1077,7 @@ def kusama_wallet_profile(wallet_address):
         'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
+    print(response)
     # identity
     identity = response['data']['account']['account_display']['identity']
     if identity != False:
@@ -2172,13 +2173,9 @@ def wallet_check(wallet_address):
     return {'wallet_network': network}
 
 
-# DEV TEST PRINTING #######################################################################################################################################################
 
 
-# json_data = json.dumps(kusama_data(test_wallet_address_kusama, kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama))
-# # import pprint
-# # pprint.pp(json_data)
-# print(json_data)
+
 
 
 
