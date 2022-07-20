@@ -11,9 +11,11 @@ def colour_print(text: str, *effects: str) -> None:
 def kusama_server_test(wallet_address):
     from kusama import kusama_data, kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama
     try:
-        json.dumps(kusama_data(wallet_address[0], kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama))
+        test = json.dumps(kusama_data(wallet_address[0], kusama_wallet_profile, current_dates, kusama_paper_diamond_handed, kusama_raw_transfers, general_kusama))
+        print(test)
         colour_print(f'{wallet_address[1]} PASS', GREEN)
-    except:
+    except Exception as e:
+        print(e)
         colour_print(f'{wallet_address[1]} FAILED', RED)
 from keys import test_wallet_address_kusama, test_wallet_address_kusama_ni, test_wallet_address_kusama_wni, test_wallet_address_kusama_wpi
 # kusama test
@@ -24,14 +26,18 @@ kusama_server_test(test_wallet_address_kusama_ni)
 kusama_server_test(test_wallet_address_kusama_wni)
 # kusama wpi
 kusama_server_test(test_wallet_address_kusama_wpi)
+
 print('\n')
+
 # polkadot
 def polkadot_server_test(wallet_address):
     from polkadot import polkadot_data, polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot
     try:
-        json.dumps(polkadot_data(wallet_address[0], polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+        test = json.dumps(polkadot_data(wallet_address[0], polkadot_wallet_profile, current_dates, polkadot_paper_diamond_handed, polkadot_raw_transfers, general_polkadot))
+        print(test)
         colour_print(f'{wallet_address[1]} PASS', GREEN)
-    except:
+    except Exception as e:
+        print(e)
         colour_print(f'{wallet_address[1]} FAILED', RED)
 from keys import test_wallet_address_polkadot, test_wallet_address_polkadot_ni, test_wallet_address_polkadot_wni, test_wallet_address_polkadot_wpi
 # polkadot test
