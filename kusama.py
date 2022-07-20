@@ -2175,6 +2175,8 @@ def wallet_check(wallet_address, specified_network):
             return network
         elif response['message'] != 'Record Not Found' and specified_network != 'all':
             return specified_network
+        elif response['message'] != 'Record Not Found' and specified_network == 'all':
+            return 'polkadot' # default to Polkadot
 
     network = False
     polkadot_check = network_check('polkadot', wallet_address)

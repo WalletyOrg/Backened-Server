@@ -19,16 +19,24 @@ def kusama_server_test(wallet_address):
         colour_print(f'{wallet_address[1]} FAILED', RED)
 from keys import test_wallet_address_kusama, test_wallet_address_kusama_ni, test_wallet_address_kusama_wni, \
     test_wallet_address_kusama_wpi, test_wallet_address_kusama_auac
+print('-' * 250)
+print('Kusama Test')
+print('-' * 250)
 # kusama test
 kusama_server_test(test_wallet_address_kusama)
+print('-' * 250)
 # kusama ni
 kusama_server_test(test_wallet_address_kusama_ni)
+print('-' * 250)
 # kusama wni
 kusama_server_test(test_wallet_address_kusama_wni)
+print('-' * 250)
 # kusama wpi
 kusama_server_test(test_wallet_address_kusama_wpi)
+print('-' * 250)
 # kusama auac
 kusama_server_test(test_wallet_address_kusama_auac)
+print('-' * 250)
 
 print('\n')
 
@@ -44,13 +52,21 @@ def polkadot_server_test(wallet_address):
         colour_print(f'{wallet_address[1]} FAILED', RED)
 from keys import test_wallet_address_polkadot, test_wallet_address_polkadot_ni, test_wallet_address_polkadot_wni, \
     test_wallet_address_polkadot_wpi, test_wallet_address_polkadot_auac
+print('-' * 250)
+print('Polkadot Test')
+print('-' * 250)
 # polkadot test
 polkadot_server_test(test_wallet_address_polkadot)
+print('-' * 250)
 # polkadot ni
 polkadot_server_test(test_wallet_address_polkadot_ni)
+print('-' * 250)
 # polkadot wni
 polkadot_server_test(test_wallet_address_polkadot_wni)
+print('-' * 250)
 # polkadot wpi
 polkadot_server_test(test_wallet_address_polkadot_wpi)
+print('-' * 250)
 # polkadot auac
 polkadot_server_test(test_wallet_address_polkadot_auac)
+print('-' * 250)
