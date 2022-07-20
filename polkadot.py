@@ -1092,15 +1092,22 @@ def polkadot_wallet_profile(wallet_address):
         'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
+    # print(response)
     # identity
-    identity = response['data']['account']['account_display']['identity']
-    if identity != False:
-        identity = True
-    else:
+    try:
+        identity = response['data']['account']['account_display']['identity']
+        if identity != False:
+            identity = True
+        else:
+            identity = False
+    except:
         identity = False
     # display name
-    display_name = response['data']['account']['account_display']['display']
-    if display_name == '':
+    try:
+        display_name = response['data']['account']['account_display']['display']
+        if display_name == '':
+            display_name = polkadot_wallet_short_name(wallet_address)
+    except:
         display_name = polkadot_wallet_short_name(wallet_address)
     # legal name
     try:
@@ -1153,10 +1160,13 @@ def polkadot_wallet_profile(wallet_address):
     except KeyError:
         email = ''
     # judgements
-    if response['data']['account']['account_display']['judgements'] == None:
+    try:
+        if str(response['data']['account']['judgements']) == str(None):
+            judgements = False
+        else:
+            judgements = True
+    except:
         judgements = False
-    else:
-        judgements = True
     # checking if sub account
     try:
         if response['data']['account']['account_display']['parent'] == None:

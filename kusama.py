@@ -1,5 +1,7 @@
 ################################################################################################################################################################################
 import datetime
+import pprint
+
 import requests
 import json
 import decimal
@@ -1077,15 +1079,22 @@ def kusama_wallet_profile(wallet_address):
         'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
+    # pprint.pp(response)
     # identity
-    identity = response['data']['account']['account_display']['identity']
-    if identity != False:
-        identity = True
-    else:
+    try:
+        identity = response['data']['account']['account_display']['identity']
+        if identity != False:
+            identity = True
+        else:
+            identity = False
+    except:
         identity = False
     # display name
-    display_name = response['data']['account']['account_display']['display']
-    if display_name == '':
+    try:
+        display_name = response['data']['account']['account_display']['display']
+        if display_name == '':
+            display_name = kusama_wallet_short_name(wallet_address)
+    except:
         display_name = kusama_wallet_short_name(wallet_address)
     # legal name
     try:
@@ -1138,10 +1147,13 @@ def kusama_wallet_profile(wallet_address):
     except KeyError:
         email = ''
     # judgements
-    if response['data']['account']['account_display']['judgements'] == None:
+    try:
+        if str(response['data']['account']['judgements']) == str(None):
+            judgements = False
+        else:
+            judgements = True
+    except:
         judgements = False
-    else:
-        judgements = True
     # checking if sub account
     try:
         if response['data']['account']['account_display']['parent'] == None:
