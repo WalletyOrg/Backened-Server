@@ -2169,25 +2169,31 @@ def wallet_check(wallet_address, specified_network):
             'X-API-Key': subscan_api_key}
         response = requests.request("POST", url, headers=headers, data=payload).text
         response = json.loads(response)
+        network_response = False
         if response['message'] == 'Record Not Found':
-            return False
+            network_response = False
         elif response['data']['account']['address'] == wallet_address:
-            return network
+            network_response = network
         elif response['message'] != 'Record Not Found' and specified_network != 'all':
-            return specified_network
+            network_response = specified_network
         elif response['message'] != 'Record Not Found' and specified_network == 'all':
-            return 'polkadot' # default to Polkadot
-
-    network = False
+            network_response = 'polkadot' # default to Polkadot
+        try:
+            wallet_address = response['data']['account']['address']
+        except KeyError:
+            wallet_address = False
+        network_data = {'network_response': network_response, 'wallet_address': wallet_address}
+        return network_data
+    network = {'network': False, 'wallet_address': False}
     polkadot_check = network_check('polkadot', wallet_address)
-    if polkadot_check == 'polkadot':
-        network = 'polkadot'
+    if polkadot_check['network_response'] == 'polkadot':
+        network = {'network': 'polkadot', 'wallet_address': polkadot_check['wallet_address']}
     else:
         kusama_check = network_check('kusama', wallet_address)
-        if kusama_check == 'kusama':
-            network = 'kusama'
-
+        if kusama_check['network_response'] == 'kusama':
+            network = {'network': 'kusama', 'wallet_address': kusama_check['wallet_address']}
     return {'wallet_network': network}
+
 
 
 
