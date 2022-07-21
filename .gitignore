@@ -9,3 +9,4 @@ technical.py
 __pycache__/kusama.cpython-310.pyc
 __pycache__/polkadot.cpython-310.pyc
 temp_testing.py
+Ignore_testing/server_testing.py
