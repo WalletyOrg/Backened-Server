@@ -1614,14 +1614,12 @@ def api_apply(name, email, comments):
 
 def report_analytic(network, wallet_address, display_name):
     try:
-        from keys import test_wallet_address_kusama, test_wallet_address_kusama_ni, test_wallet_address_kusama_wni, \
-            test_wallet_address_kusama_wpi, test_wallet_address_kusama_auac
+        from keys import kusama_test_addresss
         # message = {'new_wallet_request': {'display_name': display_name, 'wallet_address': wallet_address,
         #                                   'network': network, 'date': current_dates()}}
         # add_to_file('website_requests', message)
         clean_message = f'{display_name}\n{network}\nhttps://wallety.org/kusama?wallet_address={wallet_address}'
-        if wallet_address != test_wallet_address_kusama[0] or test_wallet_address_kusama_ni[0] or test_wallet_address_kusama_wni[0] or test_wallet_address_kusama_wpi[0]\
-                or test_wallet_address_kusama_auac[0]:
+        if wallet_address not in kusama_test_addresss:
             requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None
     except:
