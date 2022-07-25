@@ -1257,6 +1257,45 @@ def polkadot_wallet_profile(wallet_address):
     reserved_balance = format_coins(reserved_balance)
     reserved_balance_dollars = format_dollars(reserved_balance_dollars)
 
+
+    # network addresses
+    def all_wallet_formats(wallet_address):
+        def network_check(network, wallet_address):
+            url = f"https://{network}.api.subscan.io/api/v2/scan/search"
+            payload = json.dumps({"key": wallet_address})
+            headers = {
+                'Content-Type': 'application/json',
+                'X-API-Key': subscan_api_key}
+            response = requests.request("POST", url, headers=headers, data=payload).text
+            response = json.loads(response)
+
+            network_response = False
+            if response['message'] == 'Record Not Found':
+                network_response = False
+
+            elif response['data']['account']['address'] == wallet_address:
+                network_response = network
+            try:
+                wallet_address = response['data']['account']['address']
+            except KeyError:
+                wallet_address = False
+            network_data = {'network_response': network_response, 'wallet_address': wallet_address}
+            return network_data
+
+        networks = {'kusama': '', 'polkadot': ''}
+        polkadot_check = network_check('polkadot', wallet_address)
+        networks['polkadot'] = polkadot_check['wallet_address']
+        kusama_check = network_check('kusama', wallet_address)
+        networks['kusama'] = kusama_check['wallet_address']
+
+        return {'wallet_networks': networks}
+
+    network_addresses = all_wallet_formats(wallet_address)
+    polkadot_address = network_addresses['wallet_networks']['polkadot']
+    kusama_address = network_addresses['wallet_networks']['kusama']
+
+
+
     # Report analytic
     report_analytic('Polkadot', wallet_address, display_name)
 
@@ -1264,7 +1303,8 @@ def polkadot_wallet_profile(wallet_address):
         'wallet_profile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
                            'role': role,
                            'email': email, 'twitter': twitter, 'website': website, 'riot': riot, 'identity': identity,
-                           'judgements': judgements, 'sub': sub},
+                           'judgements': judgements, 'sub': sub,
+                           'kusama_address': kusama_address, 'polkadot_address': polkadot_address},
 
         'balances': {'total_balance': total_balance, 'total_balance_dollars': total_balance_dollars,
                      'transferable_balance': transferable_balance,
