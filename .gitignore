@@ -13,3 +13,4 @@ Ignore_testing/server_testing.py
 server_testing.py
 away_server_testing.py
 local_server_testing.py
+testing.py
