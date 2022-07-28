@@ -2238,6 +2238,12 @@ def wallet_check(wallet_address, specified_network):
 
 
 
+
+
+
+
+
+
 # SERER SETUP #######################################################################################################################################################
 # The whole server
 from json import dumps
