@@ -19,11 +19,4 @@ server_testing.py
 away_server_testing.py
 local_server_testing.py
 testing.py
-
-
-
-# user API ###############################################################################################################################################################################
-api.py
-api.py
 testing.py
-user_API_test.py
