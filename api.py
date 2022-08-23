@@ -51,6 +51,7 @@ def wallet_check_page():
         return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
 
 
+
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
