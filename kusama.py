@@ -468,6 +468,11 @@ def kusama_monthly_stats(all_transfers, wallet_address):
 
 def kusama_paper_diamond_handed(all_withdrawals, diamond_handed_coins):
     # paper handed
+
+
+
+
+
     paper_handed_coins = 0
 
     for i in all_withdrawals['all_withdraws']:
