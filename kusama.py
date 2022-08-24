@@ -469,10 +469,6 @@ def kusama_monthly_stats(all_transfers, wallet_address):
 def kusama_paper_diamond_handed(all_withdrawals, diamond_handed_coins):
     # paper handed
 
-
-
-
-
     paper_handed_coins = 0
 
     for i in all_withdrawals['all_withdraws']:
@@ -1084,7 +1080,7 @@ def kusama_wallet_profile(wallet_address):
         'X-API-Key': subscan_api_key}
     response = requests.request("POST", url, headers=headers, data=payload).text
     response = json.loads(response)
-    # pprint.pp(response)
+
     # identity
     try:
         identity = response['data']['account']['account_display']['identity']
@@ -1664,7 +1660,9 @@ def report_analytic(network, wallet_address, display_name):
         # message = {'new_wallet_request': {'display_name': display_name, 'wallet_address': wallet_address,
         #                                   'network': network, 'date': current_dates()}}
         # add_to_file('website_requests', message)
-        clean_message = f'{display_name}\n{network}\nhttps://wallety.org/kusama?wallet_address={wallet_address}'
+        clean_message = f'Site hit from: {display_name}\n' \
+                        f'Calling: {network}\n' \
+                        f'https://wallety.org/kusama?wallet_address={wallet_address}'
         if wallet_address not in kusama_test_addresss:
             requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None

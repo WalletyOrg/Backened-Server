@@ -1678,7 +1678,9 @@ def report_analytic(network, wallet_address, display_name):
         # message = {'new_wallet_request': {'display_name': display_name, 'wallet_address': wallet_address,
         #                                   'network': network, 'date': current_dates()}}
         # add_to_file('website_requests', message)
-        clean_message = f'{display_name}\n{network}\nhttps://wallety.org/polkadot?wallet_address={wallet_address}'
+        clean_message = f'Site hit from: {display_name}\n' \
+                        f'Calling: {network}\n' \
+                        f'https://wallety.org/polkadot?wallet_address={wallet_address}'
         if wallet_address not in polkadot_test_addresss:
             requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_report_clean}&text={clean_message}')
         return None
