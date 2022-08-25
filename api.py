@@ -1,7 +1,21 @@
 ##############################################################################################################################################################################
+import requests
+
 from kusama import *
 from key_check import *
 # Revisited funcs for API ##############################################################################################################################################################################
+
+
+
+
+# coin price
+def networkCoinPrice(network):
+    coin_price_req = requests.get(f'https://api.coingecko.com/api/v3/coins/{network}').text
+    coin_price_req = json.loads(coin_price_req)
+    coin_price_req = coin_price_req['market_data']['current_price']['usd']
+    coin_price_req = decimal.Decimal(coin_price_req)
+    return coin_price_req
+
 
 
 
@@ -148,8 +162,6 @@ def last_txn_dates_API(transfers):
 
 
 
-
-
 # format percentage
 def percentage_format_API(percentage):
     if float(percentage) != 0:
@@ -169,6 +181,29 @@ def percentage_format_API(percentage):
 
 
 
+def currency_change(number, currency):
+    if currency == 'dollar':
+        return number
+    else:
+        if currency == 'euro':
+            currency = 'EUR'
+        else:
+            currency = 'GBP'
+        rate = requests.get(f"https://api.exchangerate.host/latest?base=USD&&symbols={currency}&&amount={number}&&places=2").text
+        rate = json.loads(rate)
+        rate = rate['rates']
+        return rate[currency]
+
+
+def currency_param(CURRENCY):
+    if CURRENCY == '':
+        CURRENCY = 'dollar'
+        return CURRENCY
+    else:
+        return CURRENCY
+
+
+
 # SERER SETUP #######################################################################################################################################################
 from json import dumps
 from flask_cors import CORS
@@ -185,7 +220,7 @@ cors = CORS(app, resources={
 @app.route('/', methods=['GET'])
 def home():
     USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Server Check', 401)
+    API_key_check(USER_API_KEY, 'Server Check', 401, False)
     return Response(dumps({'wallety.org_server_status': 200}), mimetype='text/json')
 
 
@@ -194,16 +229,14 @@ def home():
 # Chain-state #############################################################################################################################################################
 @app.route('/chain-state', methods=['GET'])
 def chain_state():
+    NETWORK = str(request.args.get('network'))
+
     USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Chain State', 401)
+    API_key_check(USER_API_KEY, 'Chain State', 401, NETWORK)
 
     CURRENCY = str(request.args.get('currency'))
-    if CURRENCY == "":
-        # CURRENCY = "dollar"
-        # do  later
-        pass
+    CURRENCY = currency_param(CURRENCY)
 
-    NETWORK = str(request.args.get('network'))
     if NETWORK == "polkadot":
         from polkadot import general_polkadot
         code_import = general_polkadot
@@ -212,11 +245,13 @@ def chain_state():
         code_import = general_kusama
     CODE_IMPORT = code_import()['kusama_general']
 
-    RETURN = {'coin_price': CODE_IMPORT[f'{NETWORK}_price'],
+    RETURN = {f'coin_price_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_price'], CURRENCY),
               'percentage_change_24hr': CODE_IMPORT[f'{NETWORK}_p_increase'],
-              'market_cap': CODE_IMPORT[f'{NETWORK}_market_cap'],
+              f'market_cap_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_market_cap'], CURRENCY),
               'transfer_count': CODE_IMPORT['recent_gas']['transfer_count'],
-              'last_gas': {'coin_amount': CODE_IMPORT['recent_gas']['coin_gas_fee'], 'fiat_worth': CODE_IMPORT['recent_gas']['dollar_gas_fee']}
+              'last_gas': {'coin_amount': CODE_IMPORT['recent_gas']['coin_gas_fee'],
+                           f'coin_amount_{CURRENCY}': currency_change(CODE_IMPORT['recent_gas']['dollar_gas_fee'], CURRENCY)
+                           }
               }
 
     return Response(dumps(RETURN), mimetype='text/json')
@@ -230,10 +265,11 @@ def chain_state():
 def on_chain_identity():
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
-    USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'On Chain Identity', WALLET_ADDRESS)
-
     NETWORK = str(request.args.get('network'))
+
+    USER_API_KEY = str(request.args.get('api_key'))
+    API_key_check(USER_API_KEY, 'On Chain Identity', WALLET_ADDRESS, NETWORK)
+
     if NETWORK == "polkadot":
         from polkadot import polkadot_wallet_profile
         code_import = polkadot_wallet_profile
@@ -246,7 +282,10 @@ def on_chain_identity():
               "legal_name": CODE_IMPORT['legal_name'],
               "index": CODE_IMPORT['account_index'],
               "role": CODE_IMPORT['role'],
-              "socials": {"twitter": CODE_IMPORT['twitter'], "website": CODE_IMPORT['website'], "email": CODE_IMPORT['email'], "element": CODE_IMPORT['riot']}
+              "socials": {"twitter": CODE_IMPORT['twitter'],
+                          "website": CODE_IMPORT['website'],
+                          "email": CODE_IMPORT['email'],
+                          "element": CODE_IMPORT['riot']}
               }
 
     return Response(dumps(RETURN), mimetype='text/json')
@@ -260,16 +299,14 @@ def on_chain_identity():
 def balances():
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
+    NETWORK = str(request.args.get('network'))
+
     USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Balances', WALLET_ADDRESS)
+    API_key_check(USER_API_KEY, 'Balances', WALLET_ADDRESS, NETWORK)
 
     CURRENCY = str(request.args.get('currency'))
-    if CURRENCY == "":
-        # CURRENCY = "dollar"
-        # do  later
-        pass
+    CURRENCY = currency_param(CURRENCY)
 
-    NETWORK = str(request.args.get('network'))
     if NETWORK == "polkadot":
         from polkadot import polkadot_wallet_profile
         code_import = polkadot_wallet_profile
@@ -279,10 +316,14 @@ def balances():
     CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['wallet_profile']['balances']
 
     RETURN = {
-        "total_balance": {"coin": CODE_IMPORT['total_balance'], "fiat_worth": CODE_IMPORT['total_balance_dollars']},
-        "transferable_balance": {"coin": CODE_IMPORT['transferable_balance'], "fiat_worth": CODE_IMPORT['transferable_balance_dollars']},
-        "locked_balance": {"coin": CODE_IMPORT['locked_balance'], "fiat_worth": CODE_IMPORT['locked_balance_dollars']},
-        "reserved_balance": {"coin": CODE_IMPORT['reserved_balance'], "fiat_worth": CODE_IMPORT['reserved_balance_dollars']}
+        "total_balance": {"coin_amount": CODE_IMPORT['total_balance'],
+                          f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['total_balance_dollars'], CURRENCY)},
+        "transferable_balance": {"coin_amount": CODE_IMPORT['transferable_balance'],
+                                 f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['transferable_balance_dollars'], CURRENCY)},
+        "locked_balance": {"coin_amount": CODE_IMPORT['locked_balance'],
+                           f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['locked_balance_dollars'], CURRENCY)},
+        "reserved_balance": {"coin_amount": CODE_IMPORT['reserved_balance'],
+                             f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['reserved_balance_dollars'], CURRENCY)}
         }
 
     return Response(dumps(RETURN), mimetype='text/json')
@@ -295,10 +336,13 @@ def balances():
 def paper_diamond_handed():
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
-    USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Paper Diamond Handed', WALLET_ADDRESS)
-
     NETWORK = str(request.args.get('network'))
+
+    USER_API_KEY = str(request.args.get('api_key'))
+    API_key_check(USER_API_KEY, 'Paper Diamond Handed', WALLET_ADDRESS, NETWORK)
+
+    CURRENCY = str(request.args.get('currency'))
+    CURRENCY = currency_param(CURRENCY)
 
     # the api request function for getting transfers
     def the_transfers():
@@ -356,7 +400,7 @@ def paper_diamond_handed():
         paper_handed_coins += float(i['amount'])
 
     # paperhanded dollar amounts and formatting numbers
-    paper_handed_coins_dollars = float(kusama_price) * float(paper_handed_coins)
+    paper_handed_coins_dollars = float(networkCoinPrice(NETWORK)) * float(paper_handed_coins)
 
     # formatting numbers
     paper_handed_coins = format_coins_API(paper_handed_coins)
@@ -364,7 +408,7 @@ def paper_diamond_handed():
 
 
     # diamond handed
-    url = "https://kusama.api.subscan.io/api/v2/scan/search"
+    url = f"https://{NETWORK}.api.subscan.io/api/v2/scan/search"
     payload = json.dumps({"key": WALLET_ADDRESS})
     headers = {
         'Content-Type': 'application/json',
@@ -381,16 +425,17 @@ def paper_diamond_handed():
 
     # balances for handed coins later on
     diamond_handed_coins = float(transferable_balance) + float(locked_balance)
-    diamond_handed_coins_dollars = float(kusama_price) * float(diamond_handed_coins)
+    diamond_handed_coins_dollars = float(networkCoinPrice(NETWORK)) * float(diamond_handed_coins)
     diamond_handed_coins = format_coins_API(diamond_handed_coins)
     diamond_handed_coins_dollars = format_dollars(diamond_handed_coins_dollars)
 
-    return {'paper_handed': {'paper_handed_coins': paper_handed_coins,
-                             'paper_handed_coins_fiat_worth': paper_handed_coins_dollars},
+    RETURN = {'paper_handed': {'paper_handed_coins': paper_handed_coins,
+                               f'paper_handed_coins_{CURRENCY}': currency_change(paper_handed_coins_dollars, CURRENCY)},
+              'diamond_handed': {'diamond_handed_coins': diamond_handed_coins,
+                                 f'diamond_handed_coins_{CURRENCY}': currency_change(diamond_handed_coins_dollars, CURRENCY)}
+              }
 
-            'diamond_handed': {'diamond_handed_coins': diamond_handed_coins,
-                               'diamond_handed_coins_fiat_worth': diamond_handed_coins_dollars}
-            }
+    return Response(dumps(RETURN), mimetype='text/json')
 
 
 
@@ -404,7 +449,7 @@ def other_address_formats():
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
     USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Other Address Formats', WALLET_ADDRESS)
+    API_key_check(USER_API_KEY, 'Other Address Formats', WALLET_ADDRESS, 'kusama')
 
     from kusama import wallet_check
     code_import = wallet_check
@@ -429,17 +474,13 @@ def other_address_formats():
 def transfers():
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
-    USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Transfers', WALLET_ADDRESS)
-
-    CURRENCY = str(request.args.get('currency'))
-    if CURRENCY == "":
-        # CURRENCY = "dollar"
-        # do  later
-        pass
-
     NETWORK = str(request.args.get('network'))
 
+    USER_API_KEY = str(request.args.get('api_key'))
+    API_key_check(USER_API_KEY, 'Transfers', WALLET_ADDRESS, NETWORK)
+
+    CURRENCY = str(request.args.get('currency'))
+    CURRENCY = currency_param(CURRENCY)
 
     # the api request function for getting transfers
     def the_transfers():
@@ -501,9 +542,9 @@ def transfers():
             pass
         full_wallet_address = i['from']
         coin_amount = i['amount']
-        coin_worth_dollar = float(coin_amount) * float(kusama_price)
+        coin_worth_dollar = float(coin_amount) * float(networkCoinPrice(NETWORK))
         gas = decimal_number_formatter(i['fee'])
-        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(kusama_price)
+        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(networkCoinPrice(NETWORK))
         txn_time = raw_transfer_format_timestamp_API(i['block_timestamp'])
         days_since = txn_time['days_since']
         txn_time = txn_time['first_txn_full_date']
@@ -518,12 +559,12 @@ def transfers():
 
         deposit_transfers.append({'display_name': display_name,
                                   'wallet_address': full_wallet_address,
-                                  'deposited': coin_amount,
-                                  'deposited_fiat_worth': coin_worth_dollar,
+                                  'deposited_coin': coin_amount,
+                                  f'deposited_coin_{CURRENCY}': currency_change(coin_worth_dollar, CURRENCY),
                                   'txn_time': txn_time,
                                   'days_since': days_since,
                                   'gas_fee': gas,
-                                  'gas_dollar_worth': gas_dollar_worth
+                                  f'gas_fee_{CURRENCY}': currency_change(gas_dollar_worth, CURRENCY)
                                   })
 
 
@@ -538,9 +579,9 @@ def transfers():
             pass
         full_wallet_address = i['to']
         coin_amount = i['amount']
-        coin_worth_dollar = float(coin_amount) * float(kusama_price)
+        coin_worth_dollar = float(coin_amount) * float(networkCoinPrice(NETWORK))
         gas = decimal_number_formatter(i['fee'])
-        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(kusama_price)
+        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(networkCoinPrice(NETWORK))
         txn_time = raw_transfer_format_timestamp_API(i['block_timestamp'])
         days_since = txn_time['days_since']
         txn_time = txn_time['first_txn_full_date']
@@ -552,18 +593,20 @@ def transfers():
         gas = format_coins_longer_API(gas)
 
 
-        withdraw_transfers.append({'coin_amount': coin_amount,
-                                   'coin_worth_dollar': coin_worth_dollar,
+        withdraw_transfers.append({'withdrawn': coin_amount,
+                                   f'withdrawn_{CURRENCY}': currency_change(coin_worth_dollar, CURRENCY),
                                    'display_name': display_name,
                                    'wallet_address': full_wallet_address,
                                    'txn_time': txn_time,
                                    'days_since': days_since,
                                    'gas_fee': gas,
-                                   'gas_fee_fiat': gas_dollar_worth
+                                   f'gas_fee_{CURRENCY}': currency_change(gas_dollar_worth, CURRENCY)
                                    })
 
 
-    return {'deposit_transfers': deposit_transfers, 'withdraw_transfers': withdraw_transfers}
+    RETURN = {'deposit_transfers': deposit_transfers, 'withdraw_transfers': withdraw_transfers}
+
+    return Response(dumps(RETURN), mimetype='text/json')
 
 
 
@@ -581,17 +624,13 @@ def unique_wallets():
 
     WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
-    USER_API_KEY = str(request.args.get('api_key'))
-    API_key_check(USER_API_KEY, 'Unique Wallets', WALLET_ADDRESS)
-
-    CURRENCY = str(request.args.get('currency'))
-    if CURRENCY == "":
-        # CURRENCY = "dollar"
-        # do  later
-        pass
-
     NETWORK = str(request.args.get('network'))
 
+    USER_API_KEY = str(request.args.get('api_key'))
+    API_key_check(USER_API_KEY, 'Unique Wallets', WALLET_ADDRESS, NETWORK)
+
+    CURRENCY = str(request.args.get('currency'))
+    CURRENCY = currency_param(CURRENCY)
 
     # the api request function for getting transfers
     def the_transfers():
@@ -677,7 +716,7 @@ def unique_wallets():
                         failed_interacted_times[i[withdraw_or_deposit]] = 1
 
                     fees_coin[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee'])
-                    fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(kusama_price)
+                    fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(networkCoinPrice(NETWORK))
                     interacted_times[i[withdraw_or_deposit]] = 1
 
                     try:
@@ -698,7 +737,7 @@ def unique_wallets():
                         interacted_times[i[withdraw_or_deposit]] += 1
 
                     fees_coin[i[withdraw_or_deposit]] = fees_coin[i[withdraw_or_deposit]] + decimal_number_formatter(i['fee'])
-                    fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(kusama_price)
+                    fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(networkCoinPrice(NETWORK))
 
                 if i[withdraw_or_deposit] not in rawFLtxns:
                     rawFLtxns[i[withdraw_or_deposit]] = [i]
@@ -771,7 +810,7 @@ def unique_wallets():
         tier = i[1]
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
-        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(networkCoinPrice(NETWORK)))
         deposit_coin_amount = format_coins_API(tier['deposit_coin_amount'])
         deposit_pi_chart_percent = percentage_format_API(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer_API(tier['deposit_coin_fee'])
@@ -789,10 +828,10 @@ def unique_wallets():
         deposits_formatted.append({'display_name': deposit_display_name,
                                    'wallet_address': deposit_address,
                                    'coin_amount': deposit_coin_amount,
-                                   'coin_amount_fiat_worth': deposit_dollar_amount,
+                                   f'coin_amount_{CURRENCY}': currency_change(deposit_dollar_amount, CURRENCY),
                                    'percentage_account': deposit_pi_chart_percent,
                                    'gas_fee': deposit_coin_fee,
-                                   'gas_fee_dollars': deposit_coin_fee_dollars,
+                                   f'gas_fee_{CURRENCY}': currency_change(deposit_coin_fee_dollars, CURRENCY),
                                    'interaction_times': deposit_interaction_times,
                                    'failed_interaction_times': deposit_failed_interaction_times,
                                    'first_txn': first_txn,
@@ -808,7 +847,7 @@ def unique_wallets():
         tier = i[1]
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
-        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(networkCoinPrice(NETWORK)))
         withdraw_coin_amount = format_coins_API(tier['withdraw_coin_amount'])
         withdraw_pi_chart_percent = percentage_format_API(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer_API(tier['withdraw_coin_fee'])
@@ -826,10 +865,10 @@ def unique_wallets():
         withdrawals_formatted.append({'display_name': withdraw_display_name,
                                       'wallet_address': withdraw_address,
                                       'coin_amount': withdraw_coin_amount,
-                                      'coin_amount_fiat_worth': withdraw_dollar_amount,
+                                      f'coin_amount_{CURRENCY}': currency_change(withdraw_dollar_amount, CURRENCY),
                                       'percentage_account': withdraw_pi_chart_percent,
                                       'gas_fee': withdraw_coin_fee,
-                                      'gas_fee_dollars': withdraw_coin_fee_dollars,
+                                      f'gas_fee_{CURRENCY}': currency_change(withdraw_coin_fee_dollars, CURRENCY),
                                       'interaction_times': withdraw_interaction_times,
                                       'failed_interaction_times': withdraw_failed_interaction_times,
                                       'first_txn': first_txn,
@@ -840,8 +879,9 @@ def unique_wallets():
 
 
 
-    return {'all_deposits': deposits_formatted,
-            'all_withdrawals': withdrawals_formatted}
+    RETURN = {'all_deposits': deposits_formatted, 'all_withdrawals': withdrawals_formatted}
+
+    return Response(dumps(RETURN), mimetype='text/json')
 
 
 
