@@ -611,8 +611,8 @@ def transfers():
             gas = format_coins_longer_API(gas)
 
 
-            withdraw_transfers.append({'withdrawn': coin_amount,
-                                       f'withdrawn_{CURRENCY}': currency_change(coin_worth_dollar, CURRENCY),
+            withdraw_transfers.append({'withdrawn_coin': coin_amount,
+                                       f'withdrawn_coin_{CURRENCY}': currency_change(coin_worth_dollar, CURRENCY),
                                        'display_name': display_name,
                                        'wallet_address': full_wallet_address,
                                        'txn_time': txn_time,
@@ -622,7 +622,7 @@ def transfers():
                                        })
 
 
-        RETURN = {'deposit_transfers': deposit_transfers, 'withdraw_transfers': withdraw_transfers}
+        RETURN = {'deposited_transfers': deposit_transfers, 'withdraw_transfers': withdraw_transfers}
 
         return Response(dumps(RETURN), mimetype='text/json')
 
@@ -848,17 +848,15 @@ def unique_wallets():
 
             deposits_formatted.append({'display_name': deposit_display_name,
                                        'wallet_address': deposit_address,
-                                       'coin_amount': deposit_coin_amount,
-                                       f'coin_amount_{CURRENCY}': currency_change(deposit_dollar_amount, CURRENCY),
-                                       'percentage_account': deposit_pi_chart_percent,
+                                       'coin_volume': deposit_coin_amount,
+                                       f'coin_volume_{CURRENCY}': currency_change(deposit_dollar_amount, CURRENCY),
+                                       'percentage_of_deposits': deposit_pi_chart_percent,
                                        'gas_fee': deposit_coin_fee,
                                        f'gas_fee_{CURRENCY}': currency_change(deposit_coin_fee_dollars, CURRENCY),
                                        'interaction_times': deposit_interaction_times,
                                        'failed_interaction_times': deposit_failed_interaction_times,
-                                       'first_txn': first_txn,
-                                       'first_txn_days_since': first_days_since,
-                                       'last_txn': last_txn,
-                                       'last_txn_days_since': last_days_since
+                                       'first_txn': {'date': first_txn, 'days_since': first_days_since},
+                                       'last_txn': {'date': last_txn, 'days_since': last_days_since},
                                        })
 
 
@@ -885,22 +883,20 @@ def unique_wallets():
 
             withdrawals_formatted.append({'display_name': withdraw_display_name,
                                           'wallet_address': withdraw_address,
-                                          'coin_amount': withdraw_coin_amount,
-                                          f'coin_amount_{CURRENCY}': currency_change(withdraw_dollar_amount, CURRENCY),
-                                          'percentage_account': withdraw_pi_chart_percent,
+                                          'coin_volume': withdraw_coin_amount,
+                                          f'coin_volume_{CURRENCY}': currency_change(withdraw_dollar_amount, CURRENCY),
+                                          'percentage_of_withdrawals': withdraw_pi_chart_percent,
                                           'gas_fee': withdraw_coin_fee,
                                           f'gas_fee_{CURRENCY}': currency_change(withdraw_coin_fee_dollars, CURRENCY),
                                           'interaction_times': withdraw_interaction_times,
                                           'failed_interaction_times': withdraw_failed_interaction_times,
-                                          'first_txn': first_txn,
-                                          'first_txn_days_since': first_days_since,
-                                          'last_txn': last_txn,
-                                          'last_txn_days_since': last_days_since
+                                          'first_txn': {'date': first_txn, 'days_since': first_days_since},
+                                          'last_txn': {'date': last_txn, 'days_since': last_days_since}
                                           })
 
 
 
-        RETURN = {'all_deposits': deposits_formatted, 'all_withdrawals': withdrawals_formatted}
+        RETURN = {'unique_deposits': deposits_formatted, 'unique_withdrawals': withdrawals_formatted}
 
         return Response(dumps(RETURN), mimetype='text/json')
 
