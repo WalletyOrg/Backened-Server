@@ -1,8 +1,13 @@
 ##############################################################################################################################################################################
-import requests
-
-from kusama import *
 from key_check import *
+import pprint
+import requests
+import json
+import decimal
+import time
+from keys import *
+
+from kusama import format_dollars, decimal_number_formatter, kusama_wallet_short_name, format_dollars_longer, format_coins_machine
 # Revisited funcs for API ##############################################################################################################################################################################
 
 
@@ -14,8 +19,8 @@ def networkCoinPrice(network):
     coin_price_req = json.loads(coin_price_req)
     coin_price_req = coin_price_req['market_data']['current_price']['usd']
     coin_price_req = decimal.Decimal(coin_price_req)
+    print(1)
     return coin_price_req
-
 
 
 
@@ -202,6 +207,12 @@ def currency_param(CURRENCY):
     else:
         return CURRENCY
 
+def get_currency(CURRENCY):
+    if str(CURRENCY) == str(None):
+        return 'dollar'
+    else:
+        return CURRENCY
+
 
 
 # SERER SETUP #######################################################################################################################################################
@@ -232,13 +243,14 @@ def home():
 # Chain-state #############################################################################################################################################################
 @app.route('/chain-state', methods=['GET'])
 def chain_state():
-    try:
+    # try:
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
         API_key_check(USER_API_KEY, 'Chain State', 401, NETWORK)
 
         CURRENCY = str(request.args.get('currency'))
+        CURRENCY = get_currency(CURRENCY)
         CURRENCY = currency_param(CURRENCY)
 
         if NETWORK == "polkadot":
@@ -247,7 +259,7 @@ def chain_state():
         else:
             from kusama import general_kusama
             code_import = general_kusama
-        CODE_IMPORT = code_import()['kusama_general']
+        CODE_IMPORT = code_import()[f'{NETWORK}_general']
 
         RETURN = {f'coin_price_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_price'], CURRENCY),
                   'percentage_change_24hr': CODE_IMPORT[f'{NETWORK}_p_increase'],
@@ -259,8 +271,8 @@ def chain_state():
                   }
 
         return Response(dumps(RETURN), mimetype='text/json')
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 
@@ -269,7 +281,7 @@ def chain_state():
 # On chain identity #############################################################################################################################################################
 @app.route('/on-chain-identity', methods=['GET'])
 def on_chain_identity():
-    try:
+    # try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -296,8 +308,8 @@ def on_chain_identity():
                   }
 
         return Response(dumps(RETURN), mimetype='text/json')
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 
@@ -305,7 +317,7 @@ def on_chain_identity():
 # Balances #############################################################################################################################################################
 @app.route('/balances', methods=['GET'])
 def balances():
-    try:
+    # try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -314,6 +326,7 @@ def balances():
         API_key_check(USER_API_KEY, 'Balances', WALLET_ADDRESS, NETWORK)
 
         CURRENCY = str(request.args.get('currency'))
+        CURRENCY = get_currency(CURRENCY)
         CURRENCY = currency_param(CURRENCY)
 
         if NETWORK == "polkadot":
@@ -337,15 +350,15 @@ def balances():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 
 # Paper diamond handed #############################################################################################################################################################
 @app.route('/paper-diamond-handed', methods=['GET'])
 def paper_diamond_handed():
-    try:
+    # try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -354,7 +367,10 @@ def paper_diamond_handed():
         API_key_check(USER_API_KEY, 'Paper Diamond Handed', WALLET_ADDRESS, NETWORK)
 
         CURRENCY = str(request.args.get('currency'))
+        CURRENCY = get_currency(CURRENCY)
         CURRENCY = currency_param(CURRENCY)
+
+        COIN_PRICE = networkCoinPrice(NETWORK)
 
         # the api request function for getting transfers
         def the_transfers():
@@ -412,7 +428,7 @@ def paper_diamond_handed():
             paper_handed_coins += float(i['amount'])
 
         # paperhanded dollar amounts and formatting numbers
-        paper_handed_coins_dollars = float(networkCoinPrice(NETWORK)) * float(paper_handed_coins)
+        paper_handed_coins_dollars = float(COIN_PRICE) * float(paper_handed_coins)
 
         # formatting numbers
         paper_handed_coins = format_coins_API(paper_handed_coins)
@@ -437,7 +453,7 @@ def paper_diamond_handed():
 
         # balances for handed coins later on
         diamond_handed_coins = float(transferable_balance) + float(locked_balance)
-        diamond_handed_coins_dollars = float(networkCoinPrice(NETWORK)) * float(diamond_handed_coins)
+        diamond_handed_coins_dollars = float(COIN_PRICE) * float(diamond_handed_coins)
         diamond_handed_coins = format_coins_API(diamond_handed_coins)
         diamond_handed_coins_dollars = format_dollars(diamond_handed_coins_dollars)
 
@@ -449,8 +465,8 @@ def paper_diamond_handed():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 
@@ -459,7 +475,7 @@ def paper_diamond_handed():
 
 @app.route('/other-address-formats', methods=['GET'])
 def other_address_formats():
-    try:
+    # try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         USER_API_KEY = str(request.args.get('api_key'))
@@ -477,9 +493,9 @@ def other_address_formats():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    except:
-        return {'wallety.org_server_status': 400}
-
+    # except:
+    #     return {'wallety.org_server_status': 400}
+    #
 
 
 
@@ -489,7 +505,7 @@ def other_address_formats():
 
 @app.route('/transfers', methods=['GET'])
 def transfers():
-    try:
+    # try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -498,7 +514,10 @@ def transfers():
         API_key_check(USER_API_KEY, 'Transfers', WALLET_ADDRESS, NETWORK)
 
         CURRENCY = str(request.args.get('currency'))
+        CURRENCY = get_currency(CURRENCY)
         CURRENCY = currency_param(CURRENCY)
+
+        COIN_PRICE = networkCoinPrice(NETWORK)
 
         # the api request function for getting transfers
         def the_transfers():
@@ -560,9 +579,9 @@ def transfers():
                 pass
             full_wallet_address = i['from']
             coin_amount = i['amount']
-            coin_worth_dollar = float(coin_amount) * float(networkCoinPrice(NETWORK))
+            coin_worth_dollar = float(coin_amount) * float(COIN_PRICE)
             gas = decimal_number_formatter(i['fee'])
-            gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(networkCoinPrice(NETWORK))
+            gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(COIN_PRICE)
             txn_time = raw_transfer_format_timestamp_API(i['block_timestamp'])
             days_since = txn_time['days_since']
             txn_time = txn_time['first_txn_full_date']
@@ -597,9 +616,9 @@ def transfers():
                 pass
             full_wallet_address = i['to']
             coin_amount = i['amount']
-            coin_worth_dollar = float(coin_amount) * float(networkCoinPrice(NETWORK))
+            coin_worth_dollar = float(coin_amount) * float(COIN_PRICE)
             gas = decimal_number_formatter(i['fee'])
-            gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(networkCoinPrice(NETWORK))
+            gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(COIN_PRICE)
             txn_time = raw_transfer_format_timestamp_API(i['block_timestamp'])
             days_since = txn_time['days_since']
             txn_time = txn_time['first_txn_full_date']
@@ -627,8 +646,8 @@ def transfers():
         return Response(dumps(RETURN), mimetype='text/json')
 
 
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 
@@ -641,7 +660,7 @@ def transfers():
 
 @app.route('/unique-wallets', methods=['GET'])
 def unique_wallets():
-    try:
+    # try:
 
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
@@ -651,7 +670,10 @@ def unique_wallets():
         API_key_check(USER_API_KEY, 'Unique Wallets', WALLET_ADDRESS, NETWORK)
 
         CURRENCY = str(request.args.get('currency'))
+        CURRENCY = get_currency(CURRENCY)
         CURRENCY = currency_param(CURRENCY)
+
+        COIN_PRICE = networkCoinPrice(NETWORK)
 
         # the api request function for getting transfers
         def the_transfers():
@@ -737,7 +759,7 @@ def unique_wallets():
                             failed_interacted_times[i[withdraw_or_deposit]] = 1
 
                         fees_coin[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee'])
-                        fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(networkCoinPrice(NETWORK))
+                        fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(COIN_PRICE)
                         interacted_times[i[withdraw_or_deposit]] = 1
 
                         try:
@@ -758,7 +780,7 @@ def unique_wallets():
                             interacted_times[i[withdraw_or_deposit]] += 1
 
                         fees_coin[i[withdraw_or_deposit]] = fees_coin[i[withdraw_or_deposit]] + decimal_number_formatter(i['fee'])
-                        fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(networkCoinPrice(NETWORK))
+                        fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(COIN_PRICE)
 
                     if i[withdraw_or_deposit] not in rawFLtxns:
                         rawFLtxns[i[withdraw_or_deposit]] = [i]
@@ -831,7 +853,7 @@ def unique_wallets():
             tier = i[1]
             deposit_display_name = tier['deposit_display_name']
             deposit_address = tier['deposit_address']
-            deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(networkCoinPrice(NETWORK)))
+            deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(COIN_PRICE))
             deposit_coin_amount = format_coins_API(tier['deposit_coin_amount'])
             deposit_pi_chart_percent = percentage_format_API(tier['deposit_pi_chart_percent'])
             deposit_coin_fee = format_coins_longer_API(tier['deposit_coin_fee'])
@@ -848,13 +870,13 @@ def unique_wallets():
 
             deposits_formatted.append({'display_name': deposit_display_name,
                                        'wallet_address': deposit_address,
-                                       'coin_volume': deposit_coin_amount,
-                                       f'coin_volume_{CURRENCY}': currency_change(deposit_dollar_amount, CURRENCY),
-                                       'percentage_of_deposits': deposit_pi_chart_percent,
-                                       'gas_fee': deposit_coin_fee,
-                                       f'gas_fee_{CURRENCY}': currency_change(deposit_coin_fee_dollars, CURRENCY),
-                                       'interaction_times': deposit_interaction_times,
-                                       'failed_interaction_times': deposit_failed_interaction_times,
+                                       'total_coin_volume': deposit_coin_amount,
+                                       f'total_coin_volume_{CURRENCY}': currency_change(deposit_dollar_amount, CURRENCY),
+                                       'total_percentage_of_deposits': deposit_pi_chart_percent,
+                                       'total_gas_fee': deposit_coin_fee,
+                                       f'total_gas_fee_{CURRENCY}': currency_change(deposit_coin_fee_dollars, CURRENCY),
+                                       'total_interaction_times': deposit_interaction_times,
+                                       'total_failed_interaction_times': deposit_failed_interaction_times,
                                        'first_txn': {'date': first_txn, 'days_since': first_days_since},
                                        'last_txn': {'date': last_txn, 'days_since': last_days_since},
                                        })
@@ -866,7 +888,7 @@ def unique_wallets():
             tier = i[1]
             withdraw_display_name = tier['withdraw_display_name']
             withdraw_address = tier['withdraw_address']
-            withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(networkCoinPrice(NETWORK)))
+            withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(COIN_PRICE))
             withdraw_coin_amount = format_coins_API(tier['withdraw_coin_amount'])
             withdraw_pi_chart_percent = percentage_format_API(tier['withdraw_pi_chart_percent'])
             withdraw_coin_fee = format_coins_longer_API(tier['withdraw_coin_fee'])
@@ -883,13 +905,13 @@ def unique_wallets():
 
             withdrawals_formatted.append({'display_name': withdraw_display_name,
                                           'wallet_address': withdraw_address,
-                                          'coin_volume': withdraw_coin_amount,
-                                          f'coin_volume_{CURRENCY}': currency_change(withdraw_dollar_amount, CURRENCY),
-                                          'percentage_of_withdrawals': withdraw_pi_chart_percent,
-                                          'gas_fee': withdraw_coin_fee,
-                                          f'gas_fee_{CURRENCY}': currency_change(withdraw_coin_fee_dollars, CURRENCY),
-                                          'interaction_times': withdraw_interaction_times,
-                                          'failed_interaction_times': withdraw_failed_interaction_times,
+                                          'total_coin_volume': withdraw_coin_amount,
+                                          f'total_coin_volume_{CURRENCY}': currency_change(withdraw_dollar_amount, CURRENCY),
+                                          'total_percentage_of_withdrawals': withdraw_pi_chart_percent,
+                                          'total_gas_fee': withdraw_coin_fee,
+                                          f'total_gas_fee_{CURRENCY}': currency_change(withdraw_coin_fee_dollars, CURRENCY),
+                                          'total_interaction_times': withdraw_interaction_times,
+                                          'total_failed_interaction_times': withdraw_failed_interaction_times,
                                           'first_txn': {'date': first_txn, 'days_since': first_days_since},
                                           'last_txn': {'date': last_txn, 'days_since': last_days_since}
                                           })
@@ -901,8 +923,8 @@ def unique_wallets():
         return Response(dumps(RETURN), mimetype='text/json')
 
 
-    except:
-        return {'wallety.org_server_status': 400}
+    # except:
+    #     return {'wallety.org_server_status': 400}
 
 
 

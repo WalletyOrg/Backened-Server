@@ -1,7 +1,6 @@
 ################################################################################################################################################################################
 import datetime
 import pprint
-
 import requests
 import json
 import decimal
@@ -171,7 +170,6 @@ def kusamaPrice():
     return kusama_price_req
 
 kusama_price = decimal.Decimal(kusamaPrice())
-
 
 
 # first txn times
