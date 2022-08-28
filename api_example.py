@@ -7,13 +7,14 @@ import json
 local = 'http://127.0.0.1:7777/'
 main_server = 'https://api.wallety.org/'
 # def pref
-URL = local
+URL = main_server
 wallet_address = 'J6hXKFgZRQRc9Go8gvAwTMAima3Xqwqznz14cfsJ81hWpV3'
 network = 'kusama'
 currency = 'dollar'
-api_key = '1234'
+api_key = ''
 
 
+print('-' * 100)
 # Server test
 API_URL = f'{URL}?api_key={api_key}'
 API_URL = requests.get(API_URL).text
