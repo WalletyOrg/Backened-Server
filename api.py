@@ -19,7 +19,6 @@ def networkCoinPrice(network):
     coin_price_req = json.loads(coin_price_req)
     coin_price_req = coin_price_req['market_data']['current_price']['usd']
     coin_price_req = decimal.Decimal(coin_price_req)
-    print(1)
     return coin_price_req
 
 
