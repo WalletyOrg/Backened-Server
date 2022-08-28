@@ -26,3 +26,5 @@ __pycache__/key_check.cpython-310.pyc
 api_example.py
 user_api_key_gen.py
 API_control/user_keys.py
+API_control/__pycache__/keys.cpython-310.pyc
+API_control/__pycache__/user_keys.cpython-310.pyc

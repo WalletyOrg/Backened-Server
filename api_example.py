@@ -8,7 +8,7 @@ local = 'http://127.0.0.1:7777/'
 main_server = 'https://api.wallety.org/'
 # def pref
 URL = main_server
-wallet_address = 'J6hXKFgZRQRc9Go8gvAwTMAima3Xqwqznz14cfsJ81hWpV3'
+wallet_address = ''
 network = 'kusama'
 currency = 'dollar'
 api_key = ''
