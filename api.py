@@ -231,7 +231,11 @@ cors = CORS(app, resources={
 def home():
     try:
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Server Check', 400, False)
+
+        API_CHECK = API_key_check(USER_API_KEY, 'Server Check', 400, False)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
         return Response(dumps({'wallety.org_server_status': 200}), mimetype='text/json')
     except:
         return {'wallety.org_server_status': 400}
@@ -246,7 +250,10 @@ def chain_state():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Chain State', 401, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'Chain State', 401, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         CURRENCY = str(request.args.get('currency'))
         CURRENCY = get_currency(CURRENCY)
@@ -286,7 +293,10 @@ def on_chain_identity():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'On Chain Identity', WALLET_ADDRESS, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'On Chain Identity', WALLET_ADDRESS, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         if NETWORK == "polkadot":
             from polkadot import polkadot_wallet_profile
@@ -322,7 +332,10 @@ def balances():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Balances', WALLET_ADDRESS, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'Balances', WALLET_ADDRESS, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         CURRENCY = str(request.args.get('currency'))
         CURRENCY = get_currency(CURRENCY)
@@ -363,7 +376,10 @@ def paper_diamond_handed():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Paper Diamond Handed', WALLET_ADDRESS, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'Paper Diamond Handed', WALLET_ADDRESS, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         CURRENCY = str(request.args.get('currency'))
         CURRENCY = get_currency(CURRENCY)
@@ -478,7 +494,10 @@ def other_address_formats():
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Other Address Formats', WALLET_ADDRESS, 'kusama')
+        API_CHECK = API_key_check(USER_API_KEY, 'Other Address Formats', WALLET_ADDRESS, 'kusama')
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         from kusama import wallet_check
         code_import = wallet_check
@@ -510,7 +529,10 @@ def transfers():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Transfers', WALLET_ADDRESS, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'Transfers', WALLET_ADDRESS, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         CURRENCY = str(request.args.get('currency'))
         CURRENCY = get_currency(CURRENCY)
@@ -666,7 +688,10 @@ def unique_wallets():
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
-        API_key_check(USER_API_KEY, 'Unique Wallets', WALLET_ADDRESS, NETWORK)
+        API_CHECK = API_key_check(USER_API_KEY, 'Unique Wallets', WALLET_ADDRESS, NETWORK)
+        if API_CHECK == 404:
+            return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
+                         'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
         CURRENCY = str(request.args.get('currency'))
         CURRENCY = get_currency(CURRENCY)
