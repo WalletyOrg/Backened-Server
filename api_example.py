@@ -7,7 +7,7 @@ import json
 local = 'http://127.0.0.1:7777/'
 main_server = 'https://api.wallety.org/'
 # def pref
-URL = main_server
+URL = local
 wallet_address = ''
 network = 'kusama'
 currency = 'dollar'
@@ -66,7 +66,7 @@ print(API_URL)
 print('-' * 100)
 
 # Unique wallets
-API_URL = f'{URL}unique-wallets?api_key={api_key}&&network={currency}&&wallet_address={wallet_address}&&currency={currency}'
+API_URL = f'{URL}unique-wallets?api_key={api_key}&&network={network}&&wallet_address={wallet_address}&&currency={currency}'
 API_URL = requests.get(API_URL).text
 API_URL = json.loads(API_URL)
 print(API_URL)
