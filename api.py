@@ -12,7 +12,6 @@ from kusama import format_dollars, decimal_number_formatter, kusama_wallet_short
 
 
 
-
 # coin price
 def networkCoinPrice(network):
     coin_price_req = requests.get(f'https://api.coingecko.com/api/v3/coins/{network}').text
