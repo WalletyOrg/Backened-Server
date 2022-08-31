@@ -30,3 +30,4 @@ API_control/__pycache__/user_keys.cpython-310.pyc
 API_control/user_keys.json
 API_control/__pycache__/key_check.cpython-310.pyc
 Server testing/api_example.py
+Server testing/api_testing.py
