@@ -217,6 +217,7 @@ def remove_punk(punk):
     punk = punk.replace("%", "")
     punk = punk.replace(" ", "")
     punk = punk.replace("KSM", "")
+    punk = punk.replace("DOT", "")
     return punk
 
 
