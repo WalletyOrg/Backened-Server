@@ -237,17 +237,17 @@ cors = CORS(app, resources={
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
 def home():
-    try:
+    # try:
         USER_API_KEY = str(request.args.get('api_key'))
 
-        API_CHECK = API_key_check(USER_API_KEY, 'Server Check', 400, False)
+        API_CHECK = API_key_check(USER_API_KEY, 'Server Check', 401, False)
         if API_CHECK == 404:
             return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
                          'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
         return Response(dumps({'wallety.org_server_status': 200}), mimetype='text/json')
-    except:
-        return {'wallety.org_server_status': 400}
-
+    # except:
+    #     return {'wallety.org_server_status': 400}
+    #
 
 
 
