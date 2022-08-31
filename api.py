@@ -212,6 +212,14 @@ def get_currency(CURRENCY):
         return CURRENCY
 
 
+def remove_punk(punk):
+    punk = punk.replace(",", "")
+    punk = punk.replace("%", "")
+    punk = punk.replace(" ", "")
+    punk = punk.replace("KSM", "")
+    return punk
+
+
 
 # SERER SETUP #######################################################################################################################################################
 from json import dumps
@@ -267,10 +275,10 @@ def chain_state():
         CODE_IMPORT = code_import()[f'{NETWORK}_general']
 
         RETURN = {f'coin_price_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_price'], CURRENCY),
-                  'percentage_change_24hr': CODE_IMPORT[f'{NETWORK}_p_increase'],
+                  'percentage_change_24hr': remove_punk(CODE_IMPORT[f'{NETWORK}_p_increase']),
                   f'market_cap_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_market_cap'], CURRENCY),
-                  'transfer_count': CODE_IMPORT['recent_gas']['transfer_count'],
-                  'last_gas': {'coin_amount': CODE_IMPORT['recent_gas']['coin_gas_fee'],
+                  'transfer_count': remove_punk(CODE_IMPORT['recent_gas']['transfer_count']),
+                  'last_gas': {'coin_amount': remove_punk(CODE_IMPORT['recent_gas']['coin_gas_fee']),
                                f'coin_amount_{CURRENCY}': currency_change(CODE_IMPORT['recent_gas']['dollar_gas_fee'], CURRENCY)
                                }
                   }
@@ -349,13 +357,13 @@ def balances():
         CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['wallet_profile']['balances']
 
         RETURN = {
-            "total_balance": {"coin_amount": CODE_IMPORT['total_balance'],
+            "total_balance": {"coin_amount": remove_punk(CODE_IMPORT['total_balance']),
                               f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['total_balance_dollars'], CURRENCY)},
-            "transferable_balance": {"coin_amount": CODE_IMPORT['transferable_balance'],
+            "transferable_balance": {"coin_amount": remove_punk(CODE_IMPORT['transferable_balance']),
                                      f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['transferable_balance_dollars'], CURRENCY)},
-            "locked_balance": {"coin_amount": CODE_IMPORT['locked_balance'],
+            "locked_balance": {"coin_amount": remove_punk(CODE_IMPORT['locked_balance']),
                                f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['locked_balance_dollars'], CURRENCY)},
-            "reserved_balance": {"coin_amount": CODE_IMPORT['reserved_balance'],
+            "reserved_balance": {"coin_amount": remove_punk(CODE_IMPORT['reserved_balance']),
                                  f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['reserved_balance_dollars'], CURRENCY)}
             }
 
