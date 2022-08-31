@@ -190,6 +190,7 @@ euro_rate = rate['EUR']
 pound_rate = rate['GBP']
 
 def currency_change(number, currency):
+    number = float(number)
     if currency == 'dollar':
         return number
     else:
@@ -201,6 +202,7 @@ def currency_change(number, currency):
             # currency = 'GBP'
             number = number * pound_rate
             return number
+
 
 
 def currency_param(CURRENCY):
