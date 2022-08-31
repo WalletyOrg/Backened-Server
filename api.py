@@ -183,19 +183,24 @@ def percentage_format_API(percentage):
 
 
 
+rate = requests.get("https://api.exchangerate.host/latest?base=USD&&symbols=GBP,EUR").text
+rate = json.loads(rate)
+rate = rate['rates']
+euro_rate = rate['EUR']
+pound_rate = rate['GBP']
 
 def currency_change(number, currency):
     if currency == 'dollar':
         return number
     else:
         if currency == 'euro':
-            currency = 'EUR'
+            # currency = 'EUR'
+            number = number * euro_rate
+            return number
         else:
-            currency = 'GBP'
-        rate = requests.get(f"https://api.exchangerate.host/latest?base=USD&&symbols={currency}&&amount={number}&&places=2").text
-        rate = json.loads(rate)
-        rate = rate['rates']
-        return rate[currency]
+            # currency = 'GBP'
+            number = number * pound_rate
+            return number
 
 
 def currency_param(CURRENCY):
