@@ -359,10 +359,13 @@ def balances():
         RETURN = {
             "total_balance": {"coin_amount": remove_punk(CODE_IMPORT['total_balance']),
                               f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['total_balance_dollars'], CURRENCY)},
+
             "transferable_balance": {"coin_amount": remove_punk(CODE_IMPORT['transferable_balance']),
                                      f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['transferable_balance_dollars'], CURRENCY)},
+
             "locked_balance": {"coin_amount": remove_punk(CODE_IMPORT['locked_balance']),
                                f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['locked_balance_dollars'], CURRENCY)},
+
             "reserved_balance": {"coin_amount": remove_punk(CODE_IMPORT['reserved_balance']),
                                  f"coin_amount_{CURRENCY}": currency_change(CODE_IMPORT['reserved_balance_dollars'], CURRENCY)}
             }
