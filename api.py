@@ -244,7 +244,7 @@ cors = CORS(app, resources={
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
 def home():
-    # try:
+    try:
         USER_API_KEY = str(request.args.get('api_key'))
 
         API_CHECK = API_key_check(USER_API_KEY, 'Server Check', 401, False)
@@ -252,16 +252,16 @@ def home():
             return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
                          'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
         return Response(dumps({'wallety.org_server_status': 200}), mimetype='text/json')
-    # except:
-    #     return {'wallety.org_server_status': 400}
-    #
+    except:
+        return {'wallety.org_server_status': 400}
+
 
 
 
 # Chain-state #############################################################################################################################################################
 @app.route('/chain-state', methods=['GET'])
 def chain_state():
-    # try:
+    try:
         NETWORK = str(request.args.get('network'))
 
         USER_API_KEY = str(request.args.get('api_key'))
@@ -292,8 +292,8 @@ def chain_state():
                   }
 
         return Response(dumps(RETURN), mimetype='text/json')
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
@@ -302,7 +302,7 @@ def chain_state():
 # On chain identity #############################################################################################################################################################
 @app.route('/on-chain-identity', methods=['GET'])
 def on_chain_identity():
-    # try:
+    try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -332,8 +332,8 @@ def on_chain_identity():
                   }
 
         return Response(dumps(RETURN), mimetype='text/json')
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
@@ -341,7 +341,7 @@ def on_chain_identity():
 # Balances #############################################################################################################################################################
 @app.route('/balances', methods=['GET'])
 def balances():
-    # try:
+    try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -380,15 +380,15 @@ def balances():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
 # Paper diamond handed #############################################################################################################################################################
 @app.route('/paper-diamond-handed', methods=['GET'])
 def paper_diamond_handed():
-    # try:
+    try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -498,8 +498,8 @@ def paper_diamond_handed():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
@@ -508,7 +508,7 @@ def paper_diamond_handed():
 
 @app.route('/other-address-formats', methods=['GET'])
 def other_address_formats():
-    # try:
+    try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         USER_API_KEY = str(request.args.get('api_key'))
@@ -529,9 +529,9 @@ def other_address_formats():
 
         return Response(dumps(RETURN), mimetype='text/json')
 
-    # except:
-    #     return {'wallety.org_server_status': 400}
-    #
+    except:
+        return {'wallety.org_server_status': 400}
+
 
 
 
@@ -541,7 +541,7 @@ def other_address_formats():
 
 @app.route('/transfers', methods=['GET'])
 def transfers():
-    # try:
+    try:
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
         NETWORK = str(request.args.get('network'))
@@ -685,8 +685,8 @@ def transfers():
         return Response(dumps(RETURN), mimetype='text/json')
 
 
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
@@ -699,7 +699,7 @@ def transfers():
 
 @app.route('/unique-wallets', methods=['GET'])
 def unique_wallets():
-    # try:
+    try:
 
         WALLET_ADDRESS = str(request.args.get('wallet_address'))
 
@@ -965,8 +965,8 @@ def unique_wallets():
         return Response(dumps(RETURN), mimetype='text/json')
 
 
-    # except:
-    #     return {'wallety.org_server_status': 400}
+    except:
+        return {'wallety.org_server_status': 400}
 
 
 
