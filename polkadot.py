@@ -2282,9 +2282,10 @@ cors = CORS(app, resources={
 def home():
     try:
         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_website_hits}&text=Hit')
+        return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
     except:
+        return Response(dumps({'wallety_org_server_status': 400}), mimetype='text/json')
         pass
-    return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
 # Wallet check #####################################################################################################################################################
 @app.route('/walletcheck/', methods=['GET'])
 def wallet_check_page():
