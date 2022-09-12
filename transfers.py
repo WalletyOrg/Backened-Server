@@ -3,8 +3,8 @@ import requests
 import time
 import decimal
 from keys import *
-from universal_functions import kusama_timestamp_converter, current_dates_short, decimal_number_formatter, format_dollars, \
-    format_coins, format_dollars_longer, format_coins_longer, kusama_first_txn_dates, kusama_last_txn_dates
+from universal_functions import timestamp_converter, current_dates_short, decimal_number_formatter, format_dollars, \
+    format_coins, format_dollars_longer, format_coins_longer, first_txn_dates, last_txn_dates
 from kusama import kusama_price
 
 
@@ -51,7 +51,7 @@ def getTransfers(wallet_address, network):
     if len(all_transfers) != 0:
         first_txn = int(len(all_transfers)) - 1
         first_txn = all_transfers[first_txn]['block_timestamp']
-        first_txn = kusama_timestamp_converter(first_txn)
+        first_txn = timestamp_converter(first_txn)
         today = current_dates_short()
         total_dates_title = '(' + str(first_txn) + ' - ' + str(today) + ')'
     else:
@@ -125,13 +125,13 @@ def getTransfers(wallet_address, network):
     total_deposit_volume_coins = format_coins(total_deposit_volume_coins)
     total_deposit_volume_dollars = format_dollars(total_deposit_volume_dollars)
     # first txn dates
-    withdrawal_first_txn_date = kusama_first_txn_dates(all_withdraws)
-    deposits_first_txn_date = kusama_first_txn_dates(all_deposits)
-    total_first_txn_date = kusama_first_txn_dates(all_transfers)
+    withdrawal_first_txn_date = first_txn_dates(all_withdraws)
+    deposits_first_txn_date = first_txn_dates(all_deposits)
+    total_first_txn_date = first_txn_dates(all_transfers)
     # last txn dates
-    withdrawal_last_txn_date = kusama_last_txn_dates(all_withdraws)
-    deposits_last_txn_date = kusama_last_txn_dates(all_deposits)
-    total_last_txn_date = kusama_last_txn_dates(all_transfers)
+    withdrawal_last_txn_date = last_txn_dates(all_withdraws)
+    deposits_last_txn_date = last_txn_dates(all_deposits)
+    total_last_txn_date = last_txn_dates(all_transfers)
 
     return {'total_transfers': {
         'total': {'total_volume_coins': total_volume_coins, 'total_volume_dollars': total_volume_dollars,

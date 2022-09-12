@@ -1,7 +1,7 @@
 import requests
 import json
 from keys import *
-from universal_functions import kusama_wallet_short_name, format_coins, format_dollars, report_analytic, \
+from universal_functions import wallet_short_name, format_coins, format_dollars, report_analytic, \
     decimal_number_formatter
 from kusama import kusama_price
 
@@ -28,9 +28,9 @@ def wallet_profile(wallet_address, network):
     try:
         display_name = response['data']['account']['account_display']['display']
         if display_name == '':
-            display_name = kusama_wallet_short_name(wallet_address)
+            display_name = wallet_short_name(wallet_address)
     except:
-        display_name = kusama_wallet_short_name(wallet_address)
+        display_name = wallet_short_name(wallet_address)
     # legal name
     try:
         legal_name = response['data']['account']['legal']

@@ -1,6 +1,6 @@
 import decimal
-from universal_functions import decimal_number_formatter, format_dollars, format_coins, kusama_timestamp_converter, \
-    format_dollars_longer, format_coins_longer, kusama_first_txn_dates, kusama_last_txn_dates, current_dates_short
+from universal_functions import decimal_number_formatter, format_dollars, format_coins, timestamp_converter, \
+    format_dollars_longer, format_coins_longer, first_txn_dates, last_txn_dates, current_dates_short
 from kusama import kusama_price
 
 
@@ -33,7 +33,7 @@ def monthlyStats(all_transfers, wallet_address):
     if len(monthly_transfers) != 0:
         first_txn = int(len(monthly_transfers)) - 1
         first_txn = monthly_transfers[first_txn]['block_timestamp']
-        first_txn = kusama_timestamp_converter(first_txn)
+        first_txn = timestamp_converter(first_txn)
         today = current_dates_short()
         monthly_dates_title = '(' + str(first_txn) + ' - ' + str(today) + ')'
     else:
@@ -104,13 +104,13 @@ def monthlyStats(all_transfers, wallet_address):
     monthly_deposit_volume_dollars = format_dollars(monthly_deposit_volume_dollars)
 
     # first txn dates
-    monthly_withdrawal_first_txn_date = kusama_first_txn_dates(monthly_withdraws)
-    monthly_deposits_first_txn_date = kusama_first_txn_dates(monthly_deposits)
-    monthly_total_first_txn_date = kusama_first_txn_dates(monthly_transfers)
+    monthly_withdrawal_first_txn_date = first_txn_dates(monthly_withdraws)
+    monthly_deposits_first_txn_date = first_txn_dates(monthly_deposits)
+    monthly_total_first_txn_date = first_txn_dates(monthly_transfers)
     # last txn dates
-    monthly_withdrawal_last_txn_date = kusama_last_txn_dates(monthly_withdraws)
-    monthly_deposits_last_txn_date = kusama_last_txn_dates(monthly_deposits)
-    monthly_total_last_txn_date = kusama_last_txn_dates(monthly_transfers)
+    monthly_withdrawal_last_txn_date = last_txn_dates(monthly_withdraws)
+    monthly_deposits_last_txn_date = last_txn_dates(monthly_deposits)
+    monthly_total_last_txn_date = last_txn_dates(monthly_transfers)
 
     return {'monthly_total': {'monthly_total_volume_coins': monthly_total_volume_coins,
                               'monthly_total_volume_dollars': monthly_total_volume_dollars,

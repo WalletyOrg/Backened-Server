@@ -181,7 +181,7 @@ def percentage_format(percentage):
 
 
 # first txn times
-def kusama_first_txn_dates(transfers):
+def first_txn_dates(transfers):
     try:
         from datetime import datetime, date
         # first txn time
@@ -213,7 +213,7 @@ def kusama_first_txn_dates(transfers):
     except IndexError:
         return {'first_txn_full_date': '-', 'days_since': '-'}
 # timestamp converter
-def kusama_timestamp_converter(block_timestamp):
+def timestamp_converter(block_timestamp):
     from datetime import datetime
     full_date = datetime.fromtimestamp(block_timestamp)
     date = full_date.strftime("%d/%m/%Y")
@@ -225,35 +225,9 @@ def timestamp_converter_seconds(block_timestamp):
     date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
     date = str(date) + ' (BST)'
     return date
-def raw_transfer_format_timestamp(timestamp):
-    try:
-        from datetime import datetime, date
-        full_date = datetime.fromtimestamp(timestamp)
-        first_txn_full_date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
-        first_txn_full_date = str(first_txn_full_date) + ' BST'
-        # calculating days since
-        date_format = "%m/%d/%Y"
-        # today
-        today = date.today()
-        today = today.strftime("%m/%d/%Y")
-        today = datetime.strptime(today, date_format)
-        # first txn
-        first_txn_date = full_date.strftime("%m/%d/%Y")
-        first_txn_date = datetime.strptime(first_txn_date, date_format)
-        # calculating days_since since
-        delta = today - first_txn_date
-        days_since = delta.days
-        if days_since == 0:
-            day_message = '(today)'
-        elif days_since == 1:
-            day_message = '(1 day ago)'
-        else:
-            day_message = '({} days ago)'.format(days_since)
-        return {'first_txn_full_date': first_txn_full_date, 'days_since': day_message}
-    except IndexError:
-        return {'first_txn_full_date': '-', 'days_since': '-'}
+
 # last txn times
-def kusama_last_txn_dates(transfers):
+def last_txn_dates(transfers):
     try:
         from datetime import datetime, date
         # first txn time
@@ -287,9 +261,49 @@ def kusama_last_txn_dates(transfers):
 
 
 # short wallet name
-def kusama_wallet_short_name(address):
+def wallet_short_name(address):
     short_name = '{}...{}'.format(str(address)[:7], str(address)[40:47])
     return short_name
+
+
+
+
+
+def walletCheck(wallet_address, specified_network):
+    def network_check(network, wallet_address):
+        url = f"https://{network}.api.subscan.io/api/v2/scan/search"
+        payload = json.dumps({"key": wallet_address})
+        headers = {
+            'Content-Type': 'application/json',
+            'X-API-Key': subscan_api_key}
+        response = requests.request("POST", url, headers=headers, data=payload).text
+        response = json.loads(response)
+        network_response = False
+        if response['message'] == 'Record Not Found':
+            network_response = False
+        elif response['data']['account']['address'] == wallet_address:
+            network_response = network
+        elif response['message'] != 'Record Not Found' and specified_network != 'all':
+            network_response = specified_network
+        elif response['message'] != 'Record Not Found' and specified_network == 'all':
+            network_response = 'polkadot' # default to Polkadot
+        try:
+            wallet_address = response['data']['account']['address']
+        except KeyError:
+            wallet_address = False
+        network_data = {'network_response': network_response, 'wallet_address': wallet_address}
+        return network_data
+    network = {'network': False, 'wallet_address': False}
+    polkadot_check = network_check('polkadot', wallet_address)
+    if polkadot_check['network_response'] == 'polkadot':
+        network = {'network': 'polkadot', 'wallet_address': polkadot_check['wallet_address']}
+    else:
+        kusama_check = network_check('kusama', wallet_address)
+        if kusama_check['network_response'] == 'kusama':
+            network = {'network': 'kusama', 'wallet_address': kusama_check['wallet_address']}
+    return {'wallet_network': network}
+
+
 
 
 

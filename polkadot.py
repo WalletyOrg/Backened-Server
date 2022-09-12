@@ -2324,7 +2324,7 @@ def suggestion_form():
     except:
         return {'wallety_org_suggest_bug_server_status': 500, 'response': 'internal server error, please try again later'}
 # API wait list ##################################################################################################################################################
-@app.route('/api_apply/', methods=['GET'])
+@app.route('/apiApply/', methods=['GET'])
 def apiApply():
     try:
         name = str(request.args.get('name'))

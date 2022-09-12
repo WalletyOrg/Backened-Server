@@ -7,7 +7,7 @@ import decimal
 import time
 from keys import *
 
-from kusama import format_dollars, decimal_number_formatter, kusama_wallet_short_name, format_dollars_longer, format_coins_machine
+from universal_functions import format_dollars, decimal_number_formatter, wallet_short_name, format_dollars_longer, format_coins_machine
 # Revisited funcs for API ##############################################################################################################################################################################
 
 
@@ -517,8 +517,8 @@ def other_address_formats():
             return {404: 'Invalid API key / key not found. Please apply for a API key at wallety.org/home '
                          'or email hello@wallety.org if you think we have made a mistake. Thanks !'}
 
-        from kusama import wallet_check
-        code_import = wallet_check
+        from kusama import walletCheck
+        code_import = walletCheck
 
         polkadot_address = code_import(WALLET_ADDRESS, 'polkadot')['wallet_network']['wallet_address']
         kusama_address = code_import(WALLET_ADDRESS, 'kusama')['wallet_network']['wallet_address']
@@ -610,7 +610,7 @@ def transfers():
 
         deposit_transfers = []
         for i in all_deposits:
-            display_name = kusama_wallet_short_name(i['from'])
+            display_name = wallet_short_name(i['from'])
             try:
                 if i['from_account_display']['display'] != '':
                     display_name = i['from_account_display']['display']
@@ -647,7 +647,7 @@ def transfers():
 
         withdraw_transfers = []
         for i in all_withdraws:
-            display_name = kusama_wallet_short_name(i['to'])
+            display_name = wallet_short_name(i['to'])
             try:
                 if i['to_account_display']['display'] != '':
                     display_name = i['to_account_display']['display']
@@ -808,9 +808,9 @@ def unique_wallets():
                             if i[account_display]['identity']:
                                 wallet_names[i[withdraw_or_deposit]] = i[account_display]['display']
                             else:
-                                wallet_names[i[withdraw_or_deposit]] = kusama_wallet_short_name(i[withdraw_or_deposit])
+                                wallet_names[i[withdraw_or_deposit]] = wallet_short_name(i[withdraw_or_deposit])
                         except:
-                            wallet_names[i[withdraw_or_deposit]] = kusama_wallet_short_name(i[withdraw_or_deposit])
+                            wallet_names[i[withdraw_or_deposit]] = wallet_short_name(i[withdraw_or_deposit])
 
                     # adding onto original value
                     else:
