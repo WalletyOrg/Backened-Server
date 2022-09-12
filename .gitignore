@@ -34,3 +34,7 @@ Server testing/api_testing.py
 __pycache__/user_keys.cpython-310.pyc
 API_control/API_email_send.py
 API_control/key_gen.py
+__pycache__/paper_diamond_handed.cpython-310.pyc
+__pycache__/raw_transfers.cpython-310.pyc
+__pycache__/transfers.cpython-310.pyc
+*.pyc
