@@ -1,8 +1,9 @@
 import requests
 import json
 from keys import *
-from kusama import kusama_wallet_short_name, format_coins, format_dollars, kusama_price, decimal_number_formatter
-from universal_functions import report_analytic
+from universal_functions import kusama_wallet_short_name, format_coins, format_dollars, report_analytic, \
+    decimal_number_formatter
+from kusama import kusama_price
 
 
 def wallet_profile(wallet_address, network):

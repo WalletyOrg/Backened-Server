@@ -1,4 +1,5 @@
-from kusama import kusama_price, format_coins, format_dollars
+from universal_functions import format_coins, format_dollars
+from kusama import kusama_price
 
 
 def paper_diamond_handed(all_withdrawals, diamond_handed_coins):

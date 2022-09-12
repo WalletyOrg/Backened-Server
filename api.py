@@ -278,8 +278,8 @@ def chain_state():
             from polkadot import general_polkadot
             code_import = general_polkadot
         else:
-            from kusama import general_kusama
-            code_import = general_kusama
+            from kusama import chainState
+            code_import = chainState
         CODE_IMPORT = code_import()[f'{NETWORK}_general']
 
         RETURN = {f'coin_price_{CURRENCY}': currency_change(CODE_IMPORT[f'{NETWORK}_price'], CURRENCY),

@@ -1,165 +1,13 @@
 ################################################################################################################################################################################
 import datetime
-import pprint
 import requests
 import json
 import decimal
-import time
-from dateutil.tz import gettz
-import datetime as dt
 from keys import *
+from universal_functions import decimal_number_formatter, format_coins, format_dollars, format_coins_longer, \
+    format_dollars_longer, kusama_first_txn_dates, kusama_last_txn_dates, kusama_wallet_short_name, format_coins_machine, percentage_format, current_dates
 
 # random functions###############################################################################################################################################################################
-
-
-def current_dates():
-    now = dt.datetime.now(gettz("Europe/London"))
-    date = now.strftime('%A %d %B %Y')
-    time = now.strftime('%I:%M:%S %p')
-    time = str(time) + ' (BST)'
-    date = date + ' ' + time
-    short_date = now.strftime('%d-%m-%Y')
-    return {'date': date, 'short_date': short_date}
-def current_dates_short():
-    now = dt.datetime.now(gettz("Europe/London"))
-    date = now.strftime('%d/%m/%Y')
-    return date
-
-
-
-def decimal_number_formatter(number):
-    if decimal.Decimal(number) != 0:
-        coin_length = 12
-        balance = str(number)
-        balance_len = int(len(balance))
-        if coin_length < balance_len:
-            # full number
-            extra_length = balance_len - coin_length
-            whole_number = balance[:extra_length]
-            decimal_number = balance[extra_length:]
-            formatted_number = str(whole_number) + '.' + str(decimal_number)
-            return decimal.Decimal(formatted_number)
-        else:
-            # decimal
-            zeros = '0.000000000000'
-            amount_need_to_add = int(coin_length - balance_len)
-            formatted_number = str(zeros[:amount_need_to_add + 2]) + str(balance)
-            return decimal.Decimal(formatted_number)
-    else:
-        return 0
-
-
-
-
-# format new dollars
-def format_dollars(dollars):
-    if decimal.Decimal(dollars) != 0:
-        dollars = str(dollars)
-        point = 0
-        for i in dollars:
-            if i != '.':
-                point += 1
-            elif i == '.':
-                break
-        dollars = str(dollars)[:point + 3]
-        return str(dollars)
-    else:
-        return 0
-# format new dollars longer
-def format_dollars_longer(dollars):
-    if decimal.Decimal(dollars) != 0:
-        dollars = str(dollars)
-        point = 0
-        for i in dollars:
-            if i != '.':
-                point += 1
-            elif i == '.':
-                break
-        dollars = str(dollars[:9])
-        return str(dollars)
-    else:
-        return 0
-
-
-
-
-
-
-# format coins
-def format_coins(coins):
-    try:
-        if decimal.Decimal(coins) != 0 and decimal.Decimal(coins) >= decimal.Decimal(0.0001):
-            coins = str(coins)
-            point = 0
-            for i in coins:
-                if i != '.':
-                    point += 1
-                elif i == '.':
-                    break
-            coins = coins[:point + 5]
-            coins = format(float(coins), ",")
-            coins = str(coins) + ' KSM'
-            return str(coins)
-        else:
-            return '0 KSM'
-    except:
-        return f'{coins} KSM'
-# formatting machine coins
-def format_coins_machine(coins):
-    try:
-        if decimal.Decimal(coins) != 0 and decimal.Decimal(coins) >= decimal.Decimal(0.0001):
-            coins = str(coins)
-            point = 0
-            for i in coins:
-                if i != '.':
-                    point += 1
-                elif i == '.':
-                    break
-            coins = coins[:point + 5]
-            return float(coins)
-        else:
-            return 0
-    except:
-        return float(coins)
-# format coins longer
-def format_coins_longer(coins):
-    if decimal.Decimal(coins) != 0:
-        coins = str(coins)
-        point = 0
-        for i in coins:
-            if i != '.':
-                point += 1
-            elif i == '.':
-                break
-        coins = str(coins)[:point + 8]
-        coins = str(coins) + ' KSM'
-        return str(coins)
-
-    else:
-        return '0 KSM'
-
-
-
-
-
-
-# format percentage
-def percentage_format(percentage):
-    if float(percentage) != 0:
-        percentage = str(percentage)
-        point = 0
-        for i in percentage:
-            if i != '.':
-                point += 1
-            elif i == '.':
-                break
-        percentage = str(percentage)[:point + 6]
-        percentage = str(percentage) + '%'
-        return percentage
-    else:
-        return '0.00%'
-
-
 
 
 # kusama price
@@ -172,293 +20,10 @@ def kusamaPrice():
 kusama_price = decimal.Decimal(kusamaPrice())
 
 
-# first txn times
-def kusama_first_txn_dates(transfers):
-    try:
-        from datetime import datetime, date
-        # first txn time
-        last_txn = len(transfers) - 1
-        first_txn_stamp = transfers[last_txn]['block_timestamp']
-        full_date = datetime.fromtimestamp(first_txn_stamp)
-        first_txn_full_date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
-        first_txn_full_date = str(first_txn_full_date) + ' BST'
-        # calculating days since
-        date_format = "%m/%d/%Y"
-        # today
-        today = date.today()
-        today = today.strftime("%m/%d/%Y")
-        today = datetime.strptime(today, date_format)
-        # first txn
-        first_txn_date = full_date.strftime("%m/%d/%Y")
-        first_txn_date = datetime.strptime(first_txn_date, date_format)
-        # calculating days_since since
-        delta = today - first_txn_date
-        days_since = delta.days
-
-        if days_since == 0:
-            day_message = '(today)'
-        elif days_since == 1:
-            day_message = '(1 day ago)'
-        else:
-            day_message = '({} days ago)'.format(days_since)
-        return {'first_txn_full_date': first_txn_full_date, 'days_since': day_message}
-    except IndexError:
-        return {'first_txn_full_date': '-', 'days_since': '-'}
-# timestamp converter
-def kusama_timestamp_converter(block_timestamp):
-    from datetime import datetime
-    full_date = datetime.fromtimestamp(block_timestamp)
-    date = full_date.strftime("%d/%m/%Y")
-    return date
-# timestamp seconds converter
-def timestamp_converter_seconds(block_timestamp):
-    from datetime import datetime
-    full_date = datetime.fromtimestamp(block_timestamp)
-    date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
-    date = str(date) + ' (BST)'
-    return date
-def raw_transfer_format_timestamp(timestamp):
-    try:
-        from datetime import datetime, date
-        full_date = datetime.fromtimestamp(timestamp)
-        first_txn_full_date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
-        first_txn_full_date = str(first_txn_full_date) + ' BST'
-        # calculating days since
-        date_format = "%m/%d/%Y"
-        # today
-        today = date.today()
-        today = today.strftime("%m/%d/%Y")
-        today = datetime.strptime(today, date_format)
-        # first txn
-        first_txn_date = full_date.strftime("%m/%d/%Y")
-        first_txn_date = datetime.strptime(first_txn_date, date_format)
-        # calculating days_since since
-        delta = today - first_txn_date
-        days_since = delta.days
-        if days_since == 0:
-            day_message = '(today)'
-        elif days_since == 1:
-            day_message = '(1 day ago)'
-        else:
-            day_message = '({} days ago)'.format(days_since)
-        return {'first_txn_full_date': first_txn_full_date, 'days_since': day_message}
-    except IndexError:
-        return {'first_txn_full_date': '-', 'days_since': '-'}
-# last txn times
-def kusama_last_txn_dates(transfers):
-    try:
-        from datetime import datetime, date
-        # first txn time
-        last_txn_stamp = transfers[0]['block_timestamp']
-        full_date = datetime.fromtimestamp(last_txn_stamp)
-        last_txn_full_date = full_date.strftime("%d/%m/%Y %I:%M:%S %p")
-        last_txn_full_date = str(last_txn_full_date) + ' BST'
-        # calculating days since
-        date_format = "%m/%d/%Y"
-        # today
-        today = date.today()
-        today = today.strftime("%m/%d/%Y")
-        today = datetime.strptime(today, date_format)
-        # first txn
-        last_txn_date = full_date.strftime("%m/%d/%Y")
-        last_txn_date = datetime.strptime(last_txn_date, date_format)
-        # calculating days_since since
-        delta = today - last_txn_date
-        days_since = delta.days
-        if days_since == 0:
-            day_message = '(today)'
-        elif days_since == 1:
-            day_message = '(1 day ago)'
-        else:
-            day_message = '({} days ago)'.format(days_since)
-        return {'last_txn_full_date': last_txn_full_date, 'days_since': day_message}
-    except IndexError:
-        return {'last_txn_full_date': '-', 'days_since': '-'}
-
-
-
-
-# short wallet name
-def kusama_wallet_short_name(address):
-    short_name = '{}...{}'.format(str(address)[:7], str(address)[40:47])
-    return short_name
-
-
-
-
-# add to file
-def add_to_file(file, add_dict):
-    def write(filename, data):
-        # write
-        with open(f'{filename}.txt', 'w') as f:
-            import json
-            f.write(json.dumps(data))
-    def read(file):
-        # read
-        with open(f'{file}.txt', 'r') as f:
-            f_contents = f.read()
-            return f_contents
-    contents = read(file)
-    import ast
-    add_dict = str(add_dict)
-    add_dict = ast.literal_eval(add_dict)
-    contents = ast.literal_eval(contents)
-    contents.append(add_dict)
-    write(file, contents)
-
-
-
 
 # monthly stats###############################################################################################################################################################################
 
-
-def kusama_monthly_stats(all_transfers, wallet_address):
-
-    def timestamp_m_converter(timestamp):
-        from datetime import datetime
-        dt_object = datetime.fromtimestamp(timestamp)
-        return {'month': int(dt_object.strftime('%m')), 'year': int(dt_object.strftime('%Y'))}
-
-    # monthly transactions function
-    def monthly_transactions(all_transfers):
-        from datetime import date
-        monthly_transactions = []
-        current_month = str(date.today().strftime('%m'))
-        current_month = int(current_month)
-        current_year = str(date.today().strftime('%Y'))
-        current_year = int(current_year)
-        for i in all_transfers['all_transfers']:
-            if int(timestamp_m_converter(i['block_timestamp'])['month']) == current_month and int(
-                    timestamp_m_converter(i['block_timestamp'])['year']) == current_year:
-                monthly_transactions.append(i)
-        return monthly_transactions
-
-    monthly_transfers = monthly_transactions(all_transfers)
-    monthly_withdraws = []
-    monthly_deposits = []
-
-    # monthly dates title
-    if len(monthly_transfers) != 0:
-        first_txn = int(len(monthly_transfers)) - 1
-        first_txn = monthly_transfers[first_txn]['block_timestamp']
-        first_txn = kusama_timestamp_converter(first_txn)
-        today = current_dates_short()
-        monthly_dates_title = '(' + str(first_txn) + ' - ' + str(today) + ')'
-    else:
-        monthly_dates_title = '(--/--/-- - --/--/--)'
-
-    # deposit info's
-    monthly_deposit_volume_coins = 0
-    # withdraw info's
-    monthly_withdrawal_volume_coin = 0
-
-    monthly_withdrawal_gas_coin = decimal.Decimal(0)
-    monthly_withdrawal_failed_gas_coin = decimal.Decimal(0)
-    monthly_withdrawal_failed_interactions = 0
-
-    # organising into deposit and withdraws
-    for i in monthly_transfers:
-        if i['from'] == wallet_address:
-            monthly_withdraws.append(i)
-        else:
-            monthly_deposits.append(i)
-
-    # deposit and withdrawal interaction amounts
-    monthly_deposit_interactions = len(monthly_deposits)
-    monthly_withdrawal_interactions = len(monthly_withdraws)
-
-    # getting deposit data
-    for i in monthly_deposits:
-        monthly_deposit_volume_coins += float(i['amount'])
-
-    # getting withdrawal data
-    for i in monthly_withdraws:
-        if i['success'] == True:
-            monthly_withdrawal_volume_coin += float(i['amount'])
-            monthly_withdrawal_gas_coin += decimal_number_formatter(i['fee'])
-        else:
-            monthly_withdrawal_failed_gas_coin += decimal_number_formatter((i['fee']))
-            monthly_withdrawal_failed_interactions += 1
-
-    # total asset volume
-    monthly_total_volume_coins = 0
-
-    # getting total txn info
-    for i in monthly_transfers:
-        # Wallet volume
-        monthly_total_volume_coins += float(i['amount'])
-
-    # fee paid dollar worth
-    monthly_withdrawal_failed_gas_dollars = monthly_withdrawal_failed_gas_coin * decimal.Decimal(kusama_price)
-    monthly_withdrawal_gas_dollars = monthly_withdrawal_gas_coin * decimal.Decimal(kusama_price)
-    # deposit, withdrawal and total dollar worth
-    monthly_total_volume_dollars = monthly_total_volume_coins * float(kusama_price)
-    monthly_deposit_volume_dollars = monthly_deposit_volume_coins * float(kusama_price)
-    monthly_withdrawal_volume_dollars = monthly_withdrawal_volume_coin * float(kusama_price)
-
-    # formatting numbers
-    # total
-    monthly_total_volume_coins = format_coins(monthly_total_volume_coins)
-    monthly_total_volume_dollars = format_dollars(monthly_total_volume_dollars)
-    # withdrawal
-    monthly_withdrawal_volume_coin = format_coins(monthly_withdrawal_volume_coin)
-    monthly_withdrawal_volume_dollars = format_dollars(monthly_withdrawal_volume_dollars)
-    monthly_withdrawal_gas_coin = format_coins_longer(monthly_withdrawal_gas_coin)
-    monthly_withdrawal_gas_dollars = format_dollars_longer(monthly_withdrawal_gas_dollars)
-    monthly_withdrawal_failed_gas_coin = format_coins_longer(monthly_withdrawal_failed_gas_coin)
-    monthly_withdrawal_failed_gas_dollars = format_dollars_longer(monthly_withdrawal_failed_gas_dollars)
-    # deposit
-    monthly_deposit_volume_coins = format_coins(monthly_deposit_volume_coins)
-    monthly_deposit_volume_dollars = format_dollars(monthly_deposit_volume_dollars)
-
-    # first txn dates
-    monthly_withdrawal_first_txn_date = kusama_first_txn_dates(monthly_withdraws)
-    monthly_deposits_first_txn_date = kusama_first_txn_dates(monthly_deposits)
-    monthly_total_first_txn_date = kusama_first_txn_dates(monthly_transfers)
-    # last txn dates
-    monthly_withdrawal_last_txn_date = kusama_last_txn_dates(monthly_withdraws)
-    monthly_deposits_last_txn_date = kusama_last_txn_dates(monthly_deposits)
-    monthly_total_last_txn_date = kusama_last_txn_dates(monthly_transfers)
-
-    return {'monthly_total': {'monthly_total_volume_coins': monthly_total_volume_coins,
-                              'monthly_total_volume_dollars': monthly_total_volume_dollars,
-                              'monthly_total_interactions': monthly_deposit_interactions + monthly_withdrawal_interactions + monthly_withdrawal_failed_interactions,
-                              'monthly_total_failed_interactions': monthly_withdrawal_failed_interactions,
-                              'monthly_total_gas_coin': monthly_withdrawal_gas_coin,
-                              'monthly_total_gas_dollars': monthly_withdrawal_gas_dollars,
-                              'monthly_total_failed_gas_coin': monthly_withdrawal_failed_gas_coin,
-                              'monthly_total_failed_gas_dollars': monthly_withdrawal_failed_gas_dollars,
-                              'monthly_dates_title': monthly_dates_title,
-                              'monthly_total_first_txn_date': monthly_total_first_txn_date,
-                              'monthly_total_last_txn_date': monthly_total_last_txn_date
-                              },
-
-            'monthly_withdrawal': {'monthly_withdrawal_volume_coin': monthly_withdrawal_volume_coin,
-                                   'monthly_withdrawal_volume_dollars': monthly_withdrawal_volume_dollars,
-                                   'monthly_withdrawal_interactions': monthly_withdrawal_interactions,
-                                   'monthly_withdrawal_failed_interactions': monthly_withdrawal_failed_interactions,
-                                   'monthly_withdrawal_gas_coin': monthly_withdrawal_gas_coin,
-                                   'monthly_withdrawal_gas_dollars': monthly_withdrawal_gas_dollars,
-                                   'monthly_withdrawal_failed_gas_coin': monthly_withdrawal_failed_gas_coin,
-                                   'monthly_withdrawal_failed_gas_dollars': monthly_withdrawal_failed_gas_dollars,
-                                   'monthly_withdrawal_first_txn_date': monthly_withdrawal_first_txn_date,
-                                   'monthly_withdrawal_last_txn_date': monthly_withdrawal_last_txn_date
-                                   },
-
-            'monthly_deposit': {'monthly_deposit_volume_coins': monthly_deposit_volume_coins,
-                                'monthly_deposit_volume_dollars': monthly_deposit_volume_dollars,
-                                'monthly_deposit_interactions': monthly_deposit_interactions,
-                                'monthly_deposits_first_txn_date': monthly_deposits_first_txn_date,
-                                'monthly_deposits_last_txn_date': monthly_deposits_last_txn_date
-                                }}, \
-           {'monthly_withdraws': monthly_withdraws}, \
-           {'monthly_deposits': monthly_deposits}, \
-           {'monthly_transfers': monthly_transfers}
-
-
-
-
-
+from monthly_stats import monthlyStats
 
 # paper hand diamond hand###############################################################################################################################################################################
 
@@ -482,55 +47,7 @@ from transfers import getTransfers
 
 # general###############################################################################################################################################################################
 
-
-def general_kusama():
-    gecko = requests.get('https://api.coingecko.com/api/v3/coins/kusama').text
-    gecko = json.loads(gecko)
-    kusama_p_increase = gecko['market_data']['market_cap_change_percentage_24h']
-    point = 0
-    for i in str(kusama_p_increase):
-        if i == '.':
-            kusama_p_increase = str(kusama_p_increase)[:point + 3]
-            break
-        else:
-            point += 1
-    kusama_p_increase = str(kusama_p_increase) + '%'
-    if str(kusama_p_increase)[0] != '-':
-        kusama_p_increase = '+' + kusama_p_increase
-    kusama_market_cap = gecko['market_data']['market_cap']['usd']
-
-    def recent_gas():
-        headers = {'X-API-Key': subscan_api_key}
-        json_data = {
-            'row': 1,
-            'page': 0}
-        response = requests.post('https://kusama.api.subscan.io/api/scan/transfers', headers=headers, json=json_data)
-        response = json.loads(response.text)
-
-        transfer_count = response['data']['count']
-        transfer_count = format(int(transfer_count), ",")
-
-        fee = response['data']['transfers'][0]['fee']
-        fee = decimal_number_formatter(fee)
-        coin_gas_fee = format_coins_longer(fee)
-
-        dollar_gas_fee = decimal.Decimal(fee) * decimal.Decimal(kusama_price)
-        dollar_gas_fee = format_dollars_longer(dollar_gas_fee)
-        dollar_gas_fee = format_dollars_longer(dollar_gas_fee)
-
-        return {'coin_gas_fee': coin_gas_fee, 'dollar_gas_fee': dollar_gas_fee, 'transfer_count': transfer_count}
-
-    kusama_general_return = {'kusama_general': {'current_dates': current_dates(),
-                                         'kusama_price': float(kusama_price),
-                                         'kusama_market_cap': kusama_market_cap,
-                                         'recent_gas': recent_gas(),
-                                         'kusama_p_increase': kusama_p_increase}}
-    return kusama_general_return
-
-
-
-
-
+from chain_state import chainState
 
 # form data###############################################################################################################################################################################
 
@@ -646,17 +163,7 @@ def api_apply(name, email, comments):
 
     api_email(name, email)
 
-    message = {'name': name, 'email': email, 'comments': comments}
-    add_to_file('API_waitlist', message)
 
-
-
-
-
-
-# analytics report ###############################################################################################################################################################################
-
-from universal_functions import report_analytic
 
 # data ###############################################################################################################################################################################
 
@@ -668,7 +175,7 @@ def kusama_data(kusama_wallet_address, kusama_wallet_profile, current_dates, kus
     general_kusama = general_kusama()
     kusama_wallet_profile = kusama_wallet_profile(kusama_wallet_address, 'kusama')
     kusama_transfers_data = getTransfers(kusama_wallet_address, 'kusama')
-    kusama_monthly_transfers = kusama_monthly_stats(kusama_transfers_data[1], kusama_wallet_address)
+    kusama_monthly_transfers = monthlyStats(kusama_transfers_data[1], kusama_wallet_address)
     kusama_paper_diamond_handed = kusama_paper_diamond_handed(kusama_transfers_data[2], kusama_wallet_profile[1])
 
     kusama_top_deposit_withdraws = uniqueWallets(kusama_wallet_address,
@@ -689,7 +196,7 @@ def kusama_data(kusama_wallet_address, kusama_wallet_profile, current_dates, kus
             'current_dates': current_dates,
             'kusama_top_deposit_withdraws': kusama_top_deposit_withdraws,
             'rawTransfers': kusama_raw_transfers,
-            'general_kusama': general_kusama}
+            'chainState': general_kusama}
 
     return data
 
@@ -1306,7 +813,7 @@ def apiApply():
 def kusama_request_page():
     try:
         wallet_address = str(request.args.get('wallet_address'))
-        json_data = json.dumps(kusama_data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, rawTransfers, general_kusama))
+        json_data = json.dumps(kusama_data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, rawTransfers, chainState))
         return json_data
     except:
         return {'wallety_org_kusama_server_status': 500, 'response': 'internal server error, please try again later'}
@@ -1333,7 +840,7 @@ def kusama_custom_data():
 @app.route('/kusama/general/', methods=['GET']) # http://127.0.0.1:5000/kusama/general/
 def kusama_general():
     try:
-        json_dump = json.dumps(general_kusama())
+        json_dump = json.dumps(chainState())
         return json_dump
     except:
         return {'wallety_org_kusama_general_server_status': 500, 'response': 'internal server error, please try again later'}

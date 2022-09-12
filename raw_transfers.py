@@ -1,7 +1,7 @@
 import decimal
-from kusama import kusama_wallet_short_name, decimal_number_formatter, kusama_price, raw_transfer_format_timestamp, \
+from universal_functions import kusama_wallet_short_name, decimal_number_formatter, raw_transfer_format_timestamp, \
     format_coins, format_dollars, format_dollars_longer, format_coins_longer
-
+from kusama import kusama_price
 
 
 def rawTransfers(all_deposits, all_withdrawals):

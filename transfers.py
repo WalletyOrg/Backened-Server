@@ -3,8 +3,9 @@ import requests
 import time
 import decimal
 from keys import *
-from kusama import kusama_timestamp_converter, current_dates_short, decimal_number_formatter, format_dollars, \
-    format_coins, format_dollars_longer, format_coins_longer, kusama_first_txn_dates, kusama_last_txn_dates, kusama_price
+from universal_functions import kusama_timestamp_converter, current_dates_short, decimal_number_formatter, format_dollars, \
+    format_coins, format_dollars_longer, format_coins_longer, kusama_first_txn_dates, kusama_last_txn_dates
+from kusama import kusama_price
 
 
 
