@@ -1,11 +1,10 @@
 import datetime
 import decimal
 from universal_functions import decimal_number_formatter, format_coins, format_dollars, first_txn_dates, last_txn_dates
-from kusama import kusama_price
 
 
 
-def customTransfers(all_transfers, wallet_address, custom_to, custom_from):
+def customTransfers(all_transfers, wallet_address, custom_to, custom_from, coin_price):
 
     def timestamp_c_converter(timestamp):
         from datetime import datetime
@@ -108,13 +107,13 @@ def customTransfers(all_transfers, wallet_address, custom_to, custom_from):
         custom_total_volume_coins += float(i['amount'])
 
     # fee paid dollar worth
-    custom_withdrawal_failed_gas_dollars = custom_withdrawal_failed_gas_coin * decimal.Decimal(kusama_price)
-    custom_withdrawal_gas_dollars = custom_withdrawal_gas_coin * decimal.Decimal(kusama_price)
+    custom_withdrawal_failed_gas_dollars = custom_withdrawal_failed_gas_coin * decimal.Decimal(coin_price)
+    custom_withdrawal_gas_dollars = custom_withdrawal_gas_coin * decimal.Decimal(coin_price)
 
     # deposit, withdrawal and total dollar worth
-    custom_total_volume_dollars = custom_total_volume_coins * float(kusama_price)
-    custom_deposit_volume_dollars = custom_deposit_volume_coins * float(kusama_price)
-    custom_withdrawal_volume_dollars = custom_withdrawal_volume_coin * float(kusama_price)
+    custom_total_volume_dollars = custom_total_volume_coins * float(coin_price)
+    custom_deposit_volume_dollars = custom_deposit_volume_coins * float(coin_price)
+    custom_withdrawal_volume_dollars = custom_withdrawal_volume_coin * float(coin_price)
 
     # formatting numbers
     # total

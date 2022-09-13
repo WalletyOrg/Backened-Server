@@ -1,11 +1,13 @@
 import decimal
 from universal_functions import decimal_number_formatter, wallet_short_name, format_dollars, format_coins, \
     format_coins_machine, format_dollars_longer, format_coins_longer, percentage_format, first_txn_dates, last_txn_dates
-from kusama import kusama_price
+
+
 
 
 def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawals, monthly_deposits,
-                  monthly_withdrawals, monthly_transactions):
+                  monthly_withdrawals, monthly_transactions, coin_price):
+
     def top_accounts(wallet_address, transfers, withdraw_or_deposit):
 
         w_d_indicator = withdraw_or_deposit
@@ -39,7 +41,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
                         failed_interacted_times[i[withdraw_or_deposit]] = 1
 
                     fees_coin[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee'])
-                    fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(kusama_price)
+                    fees_dollars[i[withdraw_or_deposit]] = decimal_number_formatter(i['fee']) * decimal.Decimal(coin_price)
                     interacted_times[i[withdraw_or_deposit]] = 1
 
                     try:
@@ -60,7 +62,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
                         interacted_times[i[withdraw_or_deposit]] += 1
 
                     fees_coin[i[withdraw_or_deposit]] = fees_coin[i[withdraw_or_deposit]] + decimal_number_formatter(i['fee'])
-                    fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(kusama_price)
+                    fees_dollars[i[withdraw_or_deposit]] = decimal.Decimal(fees_coin[i[withdraw_or_deposit]]) * decimal.Decimal(coin_price)
 
                 if i[withdraw_or_deposit] not in rawFLtxns:
                     rawFLtxns[i[withdraw_or_deposit]] = [i]
@@ -293,7 +295,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
-        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(coin_price))
         deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
@@ -326,7 +328,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
-        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(coin_price))
         withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
@@ -359,7 +361,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         total_display_name = tier['total_display_name']
         total_address = tier['total_address']
-        total_dollar_amount = format_dollars(format_coins_machine(tier['total_coin_amount']) * float(kusama_price))
+        total_dollar_amount = format_dollars(format_coins_machine(tier['total_coin_amount']) * float(coin_price))
         total_coin_amount = format_coins(tier['total_coin_amount'])
         total_pi_chart_percent = percentage_format((float(tier['total_coin_amount']) / float(total_XX)) * 100)
         total_coin_fee = format_coins_longer(tier['total_coin_fee'])
@@ -392,7 +394,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
-        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(kusama_price))
+        deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(coin_price))
         deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
         deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
@@ -425,7 +427,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
-        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(kusama_price))
+        withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(coin_price))
         withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
         withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
@@ -458,7 +460,7 @@ def uniqueWallets(wallet_address, all_transactions, all_deposits, all_withdrawal
         tier = i[1]
         total_display_name = tier['monthly_total_display_name']
         total_address = tier['monthly_total_address']
-        total_dollar_amount = format_dollars(format_coins_machine(tier['monthly_total_coin_amount']) * float(kusama_price))
+        total_dollar_amount = format_dollars(format_coins_machine(tier['monthly_total_coin_amount']) * float(coin_price))
         total_coin_amount = format_coins(tier['monthly_total_coin_amount'])
         total_pi_chart_percent = percentage_format((float(tier['monthly_total_coin_amount']) / float(monthly_XX)) * 100)
         total_coin_fee = format_coins_longer(tier['monthly_total_coin_fee'])

@@ -1,7 +1,7 @@
 import decimal
 from universal_functions import wallet_short_name, decimal_number_formatter, \
     format_coins, format_dollars, format_dollars_longer, format_coins_longer
-from kusama import kusama_price
+
 
 
 
@@ -36,7 +36,7 @@ def raw_transfer_format_timestamp(timestamp):
 
 
 
-def rawTransfers(all_deposits, all_withdrawals):
+def rawTransfers(all_deposits, all_withdrawals, coin_price):
     deposit_transfers = []
     for i in all_deposits['all_deposits']:
         display_name = wallet_short_name(i['from'])
@@ -47,9 +47,9 @@ def rawTransfers(all_deposits, all_withdrawals):
             pass
         full_wallet_address = i['from']
         coin_amount = i['amount']
-        coin_worth_dollar = float(coin_amount) * float(kusama_price)
+        coin_worth_dollar = float(coin_amount) * float(coin_price)
         gas = decimal_number_formatter(i['fee'])
-        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(kusama_price)
+        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(coin_price)
         txn_time = raw_transfer_format_timestamp(i['block_timestamp'])
         days_since = txn_time['days_since']
         txn_time = txn_time['first_txn_full_date']
@@ -83,9 +83,9 @@ def rawTransfers(all_deposits, all_withdrawals):
             pass
         full_wallet_address = i['to']
         coin_amount = i['amount']
-        coin_worth_dollar = float(coin_amount) * float(kusama_price)
+        coin_worth_dollar = float(coin_amount) * float(coin_price)
         gas = decimal_number_formatter(i['fee'])
-        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(kusama_price)
+        gas_dollar_worth = decimal.Decimal(gas) * decimal.Decimal(coin_price)
         txn_time = raw_transfer_format_timestamp(i['block_timestamp'])
         days_since = txn_time['days_since']
         txn_time = txn_time['first_txn_full_date']

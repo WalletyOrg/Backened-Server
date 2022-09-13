@@ -1,12 +1,13 @@
+import pprint
+
 import requests
 import json
 from keys import *
 from universal_functions import wallet_short_name, format_coins, format_dollars, report_analytic, \
     decimal_number_formatter
-from kusama import kusama_price
 
 
-def wallet_profile(wallet_address, network):
+def walletProfile(wallet_address, network, coin_price):
     url = f"https://{network}.api.subscan.io/api/v2/scan/search"
     payload = json.dumps({"key": wallet_address})
     headers = {
@@ -164,10 +165,10 @@ def wallet_profile(wallet_address, network):
         role = 'Councillor'
 
     # dollar balances
-    total_balance_dollars = float(total_balance) * float(kusama_price)
-    locked_balance_dollars = float(locked_balance) * float(kusama_price)
-    reserved_balance_dollars = float(reserved_balance) * float(kusama_price)
-    transferable_balance_dollars = float(transferable_balance) * float(kusama_price)
+    total_balance_dollars = float(total_balance) * float(coin_price)
+    locked_balance_dollars = float(locked_balance) * float(coin_price)
+    reserved_balance_dollars = float(reserved_balance) * float(coin_price)
+    transferable_balance_dollars = float(transferable_balance) * float(coin_price)
 
     # formatting numbers
     total_balance = format_coins(total_balance)
@@ -221,8 +222,8 @@ def wallet_profile(wallet_address, network):
     # Report analytic
     report_analytic(network, wallet_address, display_name)
 
-    return {'wallet_profile': {
-        'wallet_profile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
+    return {'walletProfile': {
+        'walletProfile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
                            'role': role,
                            'email': email, 'twitter': twitter, 'website': website, 'riot': riot, 'identity': identity,
                            'judgements': judgements, 'sub': sub,

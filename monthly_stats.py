@@ -1,10 +1,10 @@
 import decimal
 from universal_functions import decimal_number_formatter, format_dollars, format_coins, timestamp_converter, \
     format_dollars_longer, format_coins_longer, first_txn_dates, last_txn_dates, current_dates_short
-from kusama import kusama_price
 
 
-def monthlyStats(all_transfers, wallet_address):
+
+def monthlyStats(all_transfers, wallet_address, coin_price):
 
     def timestamp_m_converter(timestamp):
         from datetime import datetime
@@ -81,12 +81,12 @@ def monthlyStats(all_transfers, wallet_address):
         monthly_total_volume_coins += float(i['amount'])
 
     # fee paid dollar worth
-    monthly_withdrawal_failed_gas_dollars = monthly_withdrawal_failed_gas_coin * decimal.Decimal(kusama_price)
-    monthly_withdrawal_gas_dollars = monthly_withdrawal_gas_coin * decimal.Decimal(kusama_price)
+    monthly_withdrawal_failed_gas_dollars = monthly_withdrawal_failed_gas_coin * decimal.Decimal(coin_price)
+    monthly_withdrawal_gas_dollars = monthly_withdrawal_gas_coin * decimal.Decimal(coin_price)
     # deposit, withdrawal and total dollar worth
-    monthly_total_volume_dollars = monthly_total_volume_coins * float(kusama_price)
-    monthly_deposit_volume_dollars = monthly_deposit_volume_coins * float(kusama_price)
-    monthly_withdrawal_volume_dollars = monthly_withdrawal_volume_coin * float(kusama_price)
+    monthly_total_volume_dollars = monthly_total_volume_coins * float(coin_price)
+    monthly_deposit_volume_dollars = monthly_deposit_volume_coins * float(coin_price)
+    monthly_withdrawal_volume_dollars = monthly_withdrawal_volume_coin * float(coin_price)
 
     # formatting numbers
     # total

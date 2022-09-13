@@ -1,8 +1,8 @@
 from universal_functions import format_coins, format_dollars
-from kusama import kusama_price
 
 
-def paper_diamond_handed(all_withdrawals, diamond_handed_coins):
+
+def paperDiamondHanded(all_withdrawals, diamond_handed_coins, coin_price):
     # paper handed
 
     paper_handed_coins = 0
@@ -11,7 +11,7 @@ def paper_diamond_handed(all_withdrawals, diamond_handed_coins):
         paper_handed_coins += float(i['amount'])
 
     # paperhanded dollar amounts and formatting numbers
-    paper_handed_coins_dollars = float(kusama_price) * float(paper_handed_coins)
+    paper_handed_coins_dollars = float(coin_price) * float(paper_handed_coins)
 
     # formatting numbers
     paper_handed_coins = format_coins(paper_handed_coins)
@@ -19,7 +19,7 @@ def paper_diamond_handed(all_withdrawals, diamond_handed_coins):
 
     # diamond handed
     diamond_handed_coins = diamond_handed_coins['diamond_handed_coins']
-    diamond_handed_coins_dollars = float(kusama_price) * float(diamond_handed_coins)
+    diamond_handed_coins_dollars = float(coin_price) * float(diamond_handed_coins)
     diamond_handed_coins = format_coins(diamond_handed_coins)
     diamond_handed_coins_dollars = format_dollars(diamond_handed_coins_dollars)
 

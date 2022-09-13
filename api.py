@@ -317,9 +317,9 @@ def on_chain_identity():
             from polkadot import polkadot_wallet_profile
             code_import = polkadot_wallet_profile
         else:
-            from wallet_profile import wallet_profile
-            code_import = wallet_profile
-        CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['wallet_profile']['wallet_profile']
+            from wallet_profile import walletProfile
+            code_import = walletProfile
+        CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['walletProfile']['walletProfile']
 
         RETURN = {"display_name": CODE_IMPORT['display_name'],
                   "legal_name": CODE_IMPORT['legal_name'],
@@ -360,9 +360,9 @@ def balances():
             from polkadot import polkadot_wallet_profile
             code_import = polkadot_wallet_profile
         else:
-            from kusama import wallet_profile
-            code_import = wallet_profile
-        CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['wallet_profile']['balances']
+            from kusama import walletProfile
+            code_import = walletProfile
+        CODE_IMPORT = code_import(WALLET_ADDRESS)[0]['walletProfile']['balances']
 
         RETURN = {
             "total_balance": {"coin_amount": remove_punk(CODE_IMPORT['total_balance']),

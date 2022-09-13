@@ -27,7 +27,7 @@ def report_analytic(network, wallet_address, display_name):
 
 
 
-def current_dates():
+def currentDates():
     now = dt.datetime.now(gettz("Europe/London"))
     date = now.strftime('%A %d %B %Y')
     time = now.strftime('%I:%M:%S %p')
@@ -305,5 +305,14 @@ def walletCheck(wallet_address, specified_network):
 
 
 
+
+
+
+# coin price
+def coinPrice(network):
+    price_req = requests.get(f'https://api.coingecko.com/api/v3/coins/{network}').text
+    price_req = json.loads(price_req)
+    price_req = price_req['market_data']['current_price']['usd']
+    return price_req
 
 

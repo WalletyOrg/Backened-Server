@@ -5,11 +5,10 @@ import decimal
 from keys import *
 from universal_functions import timestamp_converter, current_dates_short, decimal_number_formatter, format_dollars, \
     format_coins, format_dollars_longer, format_coins_longer, first_txn_dates, last_txn_dates
-from kusama import kusama_price
 
 
 
-def getTransfers(wallet_address, network):
+def getTransfers(wallet_address, network, coin_price):
     # the api request function for getting transfers
     def the_transfers():
         def all_transfer_req(page):
@@ -98,17 +97,15 @@ def getTransfers(wallet_address, network):
         # Wallet volume
         total_volume_coins += float(i['amount'])
 
-    # kusama price
-    global kusama_price
 
     # fee paid dollar worth
-    total_withdrawal_gas_dollars_failed = total_withdrawal_gas_coins_failed * decimal.Decimal(kusama_price)
-    total_withdrawal_gas_dollars = total_withdrawal_gas_coins * decimal.Decimal(kusama_price)
+    total_withdrawal_gas_dollars_failed = total_withdrawal_gas_coins_failed * decimal.Decimal(coin_price)
+    total_withdrawal_gas_dollars = total_withdrawal_gas_coins * decimal.Decimal(coin_price)
 
     # deposit, withdrawal and total dollar worth
-    total_volume_dollars = total_volume_coins * float(kusama_price)
-    total_deposit_volume_dollars = total_deposit_volume_coins * float(kusama_price)
-    total_withdrawal_volume_dollars = withdrawal_volume_coins * float(kusama_price)
+    total_volume_dollars = total_volume_coins * float(coin_price)
+    total_deposit_volume_dollars = total_deposit_volume_coins * float(coin_price)
+    total_withdrawal_volume_dollars = withdrawal_volume_coins * float(coin_price)
 
     # formatting numbers
     # total
