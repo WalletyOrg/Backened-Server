@@ -208,7 +208,8 @@ def kusama_custom_data():
     except:
         return {'wallety_org_custom_data_server_status': 500, 'response': 'internal server error, please try again later'}
 # kusama general ##########################################################################################################################################################
-@app.route('/kusama/general/', methods=['GET']) # http://127.0.0.1:5000/kusama/general/
+
+@app.route('/general/', methods=['GET']) # http://127.0.0.1:5000/kusama/general/
 def kusama_general():
     try:
         network = str(request.args.get('network'))

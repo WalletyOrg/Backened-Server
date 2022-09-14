@@ -6,20 +6,20 @@ from universal_functions import decimal_number_formatter, format_coins_longer, f
 
 
 def chainState(network, coin_price):
-    gecko = requests.get('https://api.coingecko.com/api/v3/coins/kusama').text
+    gecko = requests.get(f'https://api.coingecko.com/api/v3/coins/{network}').text
     gecko = json.loads(gecko)
-    kusama_p_increase = gecko['market_data']['market_cap_change_percentage_24h']
+    p_increase = gecko['market_data']['market_cap_change_percentage_24h']
     point = 0
-    for i in str(kusama_p_increase):
+    for i in str(p_increase):
         if i == '.':
-            kusama_p_increase = str(kusama_p_increase)[:point + 3]
+            p_increase = str(p_increase)[:point + 3]
             break
         else:
             point += 1
-    kusama_p_increase = str(kusama_p_increase) + '%'
-    if str(kusama_p_increase)[0] != '-':
-        kusama_p_increase = '+' + kusama_p_increase
-    kusama_market_cap = gecko['market_data']['market_cap']['usd']
+    p_increase = str(p_increase) + '%'
+    if str(p_increase)[0] != '-':
+        p_increase = '+' + p_increase
+    market_cap = gecko['market_data']['market_cap']['usd']
 
     def recent_gas():
         headers = {'X-API-Key': subscan_api_key}
@@ -42,10 +42,10 @@ def chainState(network, coin_price):
 
         return {'coin_gas_fee': coin_gas_fee, 'dollar_gas_fee': dollar_gas_fee, 'transfer_count': transfer_count}
 
-    Return = {'kusama_general': {'currentDates': currentDates(),
-                                                'kusama_price': float(coin_price),
-                                                'kusama_market_cap': kusama_market_cap,
+    Return = {f'{network}_general': {'currentDates': currentDates(),
+                                                f'{network}_price': float(coin_price),
+                                                f'{network}_market_cap': market_cap,
                                                 'recent_gas': recent_gas(),
-                                                'kusama_p_increase': kusama_p_increase}}
+                                                f'{network}_p_increase': p_increase}}
     return Return
 
