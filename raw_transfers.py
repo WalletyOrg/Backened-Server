@@ -36,7 +36,11 @@ def raw_transfer_format_timestamp(timestamp):
 
 
 
-def rawTransfers(all_deposits, all_withdrawals, coin_price):
+
+
+
+
+def rawTransfers(all_deposits, all_withdrawals, coin_price, network):
     deposit_transfers = []
     for i in all_deposits['all_deposits']:
         display_name = wallet_short_name(i['from'])
@@ -57,8 +61,8 @@ def rawTransfers(all_deposits, all_withdrawals, coin_price):
         coin_worth_dollar = format_dollars(coin_worth_dollar)
         gas_dollar_worth = format_dollars_longer(gas_dollar_worth)
         # formatting coins
-        coin_amount = format_coins(coin_amount)
-        gas = format_coins_longer(gas)
+        coin_amount = format_coins(coin_amount, network)
+        gas = format_coins_longer(gas, network)
 
         deposit_transfers.append([f'{display_name} ({full_wallet_address}) deposited {coin_amount} (',
                                   coin_worth_dollar,
@@ -93,8 +97,8 @@ def rawTransfers(all_deposits, all_withdrawals, coin_price):
         coin_worth_dollar = format_dollars(coin_worth_dollar)
         gas_dollar_worth = format_dollars_longer(gas_dollar_worth)
         # formatting coins
-        coin_amount = format_coins(coin_amount)
-        gas = format_coins_longer(gas)
+        coin_amount = format_coins(coin_amount, network)
+        gas = format_coins_longer(gas, network)
 
         withdraw_transfers.append([f'You {withdraw_withdrew} {coin_amount} (',
                                    coin_worth_dollar,

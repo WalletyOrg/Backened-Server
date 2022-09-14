@@ -34,7 +34,7 @@ def chainState(network, coin_price):
 
         fee = response['data']['transfers'][0]['fee']
         fee = decimal_number_formatter(fee)
-        coin_gas_fee = format_coins_longer(fee)
+        coin_gas_fee = format_coins_longer(fee, network)
 
         dollar_gas_fee = decimal.Decimal(fee) * decimal.Decimal(coin_price)
         dollar_gas_fee = format_dollars_longer(dollar_gas_fee)

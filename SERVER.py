@@ -32,9 +32,9 @@ def data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, ra
 
     transfers = getTransfers(wallet_address=wallet_address, network=network, coin_price=coin_price)
 
-    monthly_transfers = monthlyStats(all_transfers=transfers[1], wallet_address=wallet_address, coin_price=coin_price)
+    monthly_transfers = monthlyStats(all_transfers=transfers[1], wallet_address=wallet_address, coin_price=coin_price, network=network)
 
-    paper_diamond_handed = paper_diamond_handed(all_withdrawals=transfers[2], diamond_handed_coins=wallet_profile[1], coin_price=coin_price)
+    paper_diamond_handed = paper_diamond_handed(all_withdrawals=transfers[2], diamond_handed_coins=wallet_profile[1], coin_price=coin_price, network=network)
 
     unique_wallets = uniqueWallets(wallet_address=wallet_address,
                                    all_transactions=transfers[1]['all_transfers'],
@@ -43,9 +43,10 @@ def data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, ra
                                    monthly_deposits=monthly_transfers[2]['monthly_deposits'],
                                    monthly_withdrawals=monthly_transfers[1]['monthly_withdraws'],
                                    monthly_transactions=monthly_transfers[3]['monthly_transfers'],
-                                   coin_price=coin_price)
+                                   coin_price=coin_price,
+                                   network=network)
 
-    raw_transfers = raw_transfers(all_deposits=transfers[3], all_withdrawals=transfers[2], coin_price=coin_price)
+    raw_transfers = raw_transfers(all_deposits=transfers[3], all_withdrawals=transfers[2], coin_price=coin_price, network=network)
 
 
 
@@ -159,15 +160,15 @@ def kusama_request_page():
 # Polkadot ##########################################################################################################################################################
 @app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
 def polkadot_request_page():
-    try:
+    # try:
         wallet_address = str(request.args.get('wallet_address'))
         network = 'polkadot'
         coin_price = decimal.Decimal(coinPrice(network))
         json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
         return json_data
-    except:
-        return {'wallety.org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
-
+    # except:
+    #     return {'wallety.org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+    #
 
 
 
@@ -195,8 +196,8 @@ def kusama_custom_data():
         coin_price = decimal.Decimal(coinPrice(network))
 
         all_transfers_custom = getTransfers(wallet_address, network, coin_price=coin_price)[1]
-        custom_data = customTransfers(all_transfers_custom, wallet_address, custom_to, custom_from, coin_price=coin_price)
-        custom_top_accounts = customUniqueWallets(wallet_address, custom_data[2], custom_data[1], custom_data[3], coin_price=coin_price)
+        custom_data = customTransfers(all_transfers_custom, wallet_address, custom_to, custom_from, coin_price=coin_price, network=network)
+        custom_top_accounts = customUniqueWallets(wallet_address, custom_data[2], custom_data[1], custom_data[3], coin_price=coin_price, network=network)
         return_custom = {'custom_data_total': custom_data[0]['custom_total'],
                          'custom_data_withdrawals': custom_data[0]['custom_withdrawal'],
                          'custom_data_deposits': custom_data[0]['custom_deposit'],

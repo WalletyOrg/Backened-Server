@@ -4,7 +4,7 @@ from universal_functions import decimal_number_formatter, format_dollars, format
 
 
 
-def monthlyStats(all_transfers, wallet_address, coin_price):
+def monthlyStats(all_transfers, wallet_address, coin_price, network):
 
     def timestamp_m_converter(timestamp):
         from datetime import datetime
@@ -90,17 +90,17 @@ def monthlyStats(all_transfers, wallet_address, coin_price):
 
     # formatting numbers
     # total
-    monthly_total_volume_coins = format_coins(monthly_total_volume_coins)
+    monthly_total_volume_coins = format_coins(monthly_total_volume_coins, network)
     monthly_total_volume_dollars = format_dollars(monthly_total_volume_dollars)
     # withdrawal
-    monthly_withdrawal_volume_coin = format_coins(monthly_withdrawal_volume_coin)
+    monthly_withdrawal_volume_coin = format_coins(monthly_withdrawal_volume_coin, network)
     monthly_withdrawal_volume_dollars = format_dollars(monthly_withdrawal_volume_dollars)
-    monthly_withdrawal_gas_coin = format_coins_longer(monthly_withdrawal_gas_coin)
+    monthly_withdrawal_gas_coin = format_coins_longer(monthly_withdrawal_gas_coin, network)
     monthly_withdrawal_gas_dollars = format_dollars_longer(monthly_withdrawal_gas_dollars)
-    monthly_withdrawal_failed_gas_coin = format_coins_longer(monthly_withdrawal_failed_gas_coin)
+    monthly_withdrawal_failed_gas_coin = format_coins_longer(monthly_withdrawal_failed_gas_coin, network)
     monthly_withdrawal_failed_gas_dollars = format_dollars_longer(monthly_withdrawal_failed_gas_dollars)
     # deposit
-    monthly_deposit_volume_coins = format_coins(monthly_deposit_volume_coins)
+    monthly_deposit_volume_coins = format_coins(monthly_deposit_volume_coins, network)
     monthly_deposit_volume_dollars = format_dollars(monthly_deposit_volume_dollars)
 
     # first txn dates

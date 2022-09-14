@@ -1,5 +1,3 @@
-import pprint
-
 import requests
 import json
 from keys import *
@@ -171,13 +169,13 @@ def walletProfile(wallet_address, network, coin_price):
     transferable_balance_dollars = float(transferable_balance) * float(coin_price)
 
     # formatting numbers
-    total_balance = format_coins(total_balance)
+    total_balance = format_coins(total_balance, network)
     total_balance_dollars = format_dollars(total_balance_dollars)
-    transferable_balance = format_coins(transferable_balance)
+    transferable_balance = format_coins(transferable_balance, network)
     transferable_balance_dollars = format_dollars(transferable_balance_dollars)
-    locked_balance = format_coins(locked_balance)
+    locked_balance = format_coins(locked_balance, network)
     locked_balance_dollars = format_dollars(locked_balance_dollars)
-    reserved_balance = format_coins(reserved_balance)
+    reserved_balance = format_coins(reserved_balance, network)
     reserved_balance_dollars = format_dollars(reserved_balance_dollars)
 
 

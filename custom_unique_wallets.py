@@ -5,7 +5,7 @@ from universal_functions import decimal_number_formatter, wallet_short_name, for
 
 
 
-def customUniqueWallets(wallet_address, custom_deposits, custom_withdrawals, custom_transactions, coin_price):
+def customUniqueWallets(wallet_address, custom_deposits, custom_withdrawals, custom_transactions, coin_price, network):
 
     # formatting input data
     custom_deposits = custom_deposits['custom_deposits']
@@ -215,9 +215,9 @@ def customUniqueWallets(wallet_address, custom_deposits, custom_withdrawals, cus
         deposit_display_name = tier['deposit_display_name']
         deposit_address = tier['deposit_address']
         deposit_dollar_amount = format_dollars(format_coins_machine(tier['deposit_coin_amount']) * float(coin_price))
-        deposit_coin_amount = format_coins(tier['deposit_coin_amount'])
+        deposit_coin_amount = format_coins(tier['deposit_coin_amount'], network)
         deposit_pi_chart_percent = percentage_format(tier['deposit_pi_chart_percent'])
-        deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'])
+        deposit_coin_fee = format_coins_longer(tier['deposit_coin_fee'], network)
         deposit_coin_fee_dollars = format_dollars_longer(tier['deposit_coin_fee_dollars'])
         deposit_interaction_times = tier['deposit_interaction_times']
         deposit_interaction_times_times = time_times(tier['deposit_interaction_times'])
@@ -248,9 +248,9 @@ def customUniqueWallets(wallet_address, custom_deposits, custom_withdrawals, cus
         withdraw_display_name = tier['withdraw_display_name']
         withdraw_address = tier['withdraw_address']
         withdraw_dollar_amount = format_dollars(format_coins_machine(tier['withdraw_coin_amount']) * float(coin_price))
-        withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'])
+        withdraw_coin_amount = format_coins(tier['withdraw_coin_amount'], network)
         withdraw_pi_chart_percent = percentage_format(tier['withdraw_pi_chart_percent'])
-        withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'])
+        withdraw_coin_fee = format_coins_longer(tier['withdraw_coin_fee'], network)
         withdraw_coin_fee_dollars = format_dollars_longer(tier['withdraw_coin_fee_dollars'])
         withdraw_interaction_times = tier['withdraw_interaction_times']
         withdraw_interaction_times_times = time_times(tier['withdraw_interaction_times'])
@@ -281,9 +281,9 @@ def customUniqueWallets(wallet_address, custom_deposits, custom_withdrawals, cus
         total_display_name = tier['total_display_name']
         total_address = tier['total_address']
         total_dollar_amount = format_dollars(format_coins_machine(tier['total_coin_amount']) * float(coin_price))
-        total_coin_amount = format_coins(tier['total_coin_amount'])
+        total_coin_amount = format_coins(tier['total_coin_amount'], network)
         total_pi_chart_percent = percentage_format((float(tier['total_coin_amount']) / float(total_XX)) * 100)
-        total_coin_fee = format_coins_longer(tier['total_coin_fee'])
+        total_coin_fee = format_coins_longer(tier['total_coin_fee'], network)
         total_coin_fee_dollars = format_dollars_longer(tier['total_coin_fee_dollars'])
         total_interaction_times = tier['total_interaction_times']
         total_interaction_times_times = time_times(tier['total_interaction_times'])

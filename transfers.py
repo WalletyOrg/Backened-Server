@@ -109,17 +109,17 @@ def getTransfers(wallet_address, network, coin_price):
 
     # formatting numbers
     # total
-    total_volume_coins = format_coins(total_volume_coins)
+    total_volume_coins = format_coins(total_volume_coins, network)
     total_volume_dollars = format_dollars(total_volume_dollars)
     # withdrawal
-    withdrawal_volume_coins = format_coins(withdrawal_volume_coins)
+    withdrawal_volume_coins = format_coins(withdrawal_volume_coins, network)
     total_withdrawal_volume_dollars = format_dollars(total_withdrawal_volume_dollars)
-    total_withdrawal_gas_coins = format_coins_longer(total_withdrawal_gas_coins)
+    total_withdrawal_gas_coins = format_coins_longer(total_withdrawal_gas_coins, network)
     total_withdrawal_gas_dollars = format_dollars_longer(total_withdrawal_gas_dollars)
-    total_withdrawal_gas_coins_failed = format_coins_longer(total_withdrawal_gas_coins_failed)
+    total_withdrawal_gas_coins_failed = format_coins_longer(total_withdrawal_gas_coins_failed, network)
     total_withdrawal_gas_dollars_failed = format_dollars_longer(total_withdrawal_gas_dollars_failed)
     # deposits
-    total_deposit_volume_coins = format_coins(total_deposit_volume_coins)
+    total_deposit_volume_coins = format_coins(total_deposit_volume_coins, network)
     total_deposit_volume_dollars = format_dollars(total_deposit_volume_dollars)
     # first txn dates
     withdrawal_first_txn_date = first_txn_dates(all_withdraws)

@@ -99,11 +99,18 @@ def format_dollars_longer(dollars):
 
 
 
+# get ticker
+def getTicker(network):
+    ticker = {'kusama': 'KSM', 'polkadot': 'DOT', 'acala': 'ACA', 'moonbeam': 'GLMR', 'astar': 'ASTR'}
+    return ticker[network]
+
+
 
 
 
 # format coins
-def format_coins(coins):
+def format_coins(coins, network):
+    ticker = getTicker(network)
     try:
         if decimal.Decimal(coins) != 0 and decimal.Decimal(coins) >= decimal.Decimal(0.0001):
             coins = str(coins)
@@ -115,12 +122,12 @@ def format_coins(coins):
                     break
             coins = coins[:point + 5]
             coins = format(float(coins), ",")
-            coins = str(coins) + ' KSM'
+            coins = str(coins) + f' {ticker}'
             return str(coins)
         else:
-            return '0 KSM'
+            return f'0 {ticker}'
     except:
-        return f'{coins} KSM'
+        return f'{coins} {ticker}'
 # formatting machine coins
 def format_coins_machine(coins):
     try:
@@ -139,7 +146,8 @@ def format_coins_machine(coins):
     except:
         return float(coins)
 # format coins longer
-def format_coins_longer(coins):
+def format_coins_longer(coins, network):
+    ticker = getTicker(network)
     if decimal.Decimal(coins) != 0:
         coins = str(coins)
         point = 0
@@ -149,11 +157,11 @@ def format_coins_longer(coins):
             elif i == '.':
                 break
         coins = str(coins)[:point + 8]
-        coins = str(coins) + ' KSM'
+        coins = str(coins) + f' {ticker}'
         return str(coins)
 
     else:
-        return '0 KSM'
+        return f'0 {ticker}'
 
 
 

@@ -4,7 +4,7 @@ from universal_functions import decimal_number_formatter, format_coins, format_d
 
 
 
-def customTransfers(all_transfers, wallet_address, custom_to, custom_from, coin_price):
+def customTransfers(all_transfers, wallet_address, custom_to, custom_from, coin_price, network):
 
     def timestamp_c_converter(timestamp):
         from datetime import datetime
@@ -117,17 +117,17 @@ def customTransfers(all_transfers, wallet_address, custom_to, custom_from, coin_
 
     # formatting numbers
     # total
-    custom_total_volume_coins = format_coins(custom_total_volume_coins)
+    custom_total_volume_coins = format_coins(custom_total_volume_coins, network)
     custom_total_volume_dollars = format_dollars(custom_total_volume_dollars)
     # withdrawal
-    custom_withdrawal_volume_coin = format_coins(custom_withdrawal_volume_coin)
+    custom_withdrawal_volume_coin = format_coins(custom_withdrawal_volume_coin, network)
     custom_withdrawal_volume_dollars = format_dollars(custom_withdrawal_volume_dollars)
-    custom_withdrawal_gas_coin = format_coins(custom_withdrawal_gas_coin)
+    custom_withdrawal_gas_coin = format_coins(custom_withdrawal_gas_coin, network)
     custom_withdrawal_gas_dollars = format_dollars(custom_withdrawal_gas_dollars)
-    custom_withdrawal_failed_gas_coin = format_coins(custom_withdrawal_failed_gas_coin)
+    custom_withdrawal_failed_gas_coin = format_coins(custom_withdrawal_failed_gas_coin, network)
     custom_withdrawal_failed_gas_dollars = format_dollars(custom_withdrawal_failed_gas_dollars)
     # deposit
-    custom_deposit_volume_coins = format_coins(custom_deposit_volume_coins)
+    custom_deposit_volume_coins = format_coins(custom_deposit_volume_coins, network)
     custom_deposit_volume_dollars = format_dollars(custom_deposit_volume_dollars)
     # first txn dates
     custom_withdrawal_first_txn_date = first_txn_dates(custom_withdraws)
