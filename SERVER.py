@@ -50,7 +50,7 @@ def data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, ra
 
 
 
-    data = {'wallety.org_server_status': 200,
+    data = {'wallety_org_server_status': 200,
             'wallet_address': wallet_address,
             'wallet_profile': wallet_profile[0],
             'transfers': transfers[0],
@@ -89,9 +89,9 @@ cors = CORS(app, resources={
 def home():
     try:
         requests.get(f'https://api.telegram.org/bot{telegram_api_key}/sendMessage?chat_id={telegram_chat_id_website_hits}&text=Hit')
-        return Response(dumps({'wallety.org_server_status': 200}), mimetype='text/json')
+        return Response(dumps({'wallety_org_server_status': 200}), mimetype='text/json')
     except:
-        return Response(dumps({'wallety.org_server_status': 400}), mimetype='text/json')
+        return Response(dumps({'wallety_org_server_status': 400}), mimetype='text/json')
 # Wallet check #####################################################################################################################################################
 @app.route('/walletcheck/', methods=['GET'])
 def wallet_check_page():
@@ -101,7 +101,7 @@ def wallet_check_page():
         json_dump = json.dumps(walletCheck(wallet_address, specified_network))
         return json_dump
     except:
-        return {'wallety.org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
+        return {'wallety_org_wallet_check_server_status': 500, 'response': 'internal server error, please try again later'}
 # Join wallety form ##################################################################################################################################################
 @app.route('/joinwalletyform/', methods=['GET'])
 def join_w_form():
@@ -156,7 +156,7 @@ def kusama_request_page():
         json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
         return json_data
     except:
-        return {'wallety.org_kusama_server_status': 500, 'response': 'internal server error, please try again later'}
+        return {'wallety_org_kusama_server_status': 500, 'response': 'internal server error, please try again later'}
 # Polkadot ##########################################################################################################################################################
 @app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
 def polkadot_request_page():
@@ -167,7 +167,7 @@ def polkadot_request_page():
         json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
         return json_data
     except:
-        return {'wallety.org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+        return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
 
 
 
@@ -222,7 +222,7 @@ def general():
         json_dump = json.dumps(chainState(network=network, coin_price=coin_price))
         return json_dump
     except:
-        return {'wallety.org_general_server_status': 500, 'response': 'internal server error, please try again later'}
+        return {'wallety_org_general_server_status': 500, 'response': 'internal server error, please try again later'}
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
