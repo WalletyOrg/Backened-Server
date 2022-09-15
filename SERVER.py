@@ -207,21 +207,22 @@ def kusama_custom_data():
         return json_data
     except:
         return {'wallety_org_custom_data_server_status': 500, 'response': 'internal server error, please try again later'}
-# kusama general ##########################################################################################################################################################
 
-@app.route('/general/', methods=['GET']) # http://127.0.0.1:5000/kusama/general/
-def kusama_general():
+
+
+
+
+
+# general ##########################################################################################################################################################
+@app.route('/general/', methods=['GET'])
+def general():
     try:
         network = str(request.args.get('network'))
         coin_price = decimal.Decimal(coinPrice(network))
         json_dump = json.dumps(chainState(network=network, coin_price=coin_price))
         return json_dump
     except:
-        return {'wallety_org_kusama_general_server_status': 500, 'response': 'internal server error, please try again later'}
-
-
-
-
+        return {'wallety.org_general_server_status': 500, 'response': 'internal server error, please try again later'}
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
