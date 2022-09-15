@@ -42,7 +42,7 @@ def chainState(network, coin_price):
 
         return {'coin_gas_fee': coin_gas_fee, 'dollar_gas_fee': dollar_gas_fee, 'transfer_count': transfer_count}
 
-    Return = {f'{network}_general': {'currentDates': currentDates(),
+    Return = {f'{network}_general': {'current_dates': currentDates(),
                                                 f'{network}_price': float(coin_price),
                                                 f'{network}_market_cap': market_cap,
                                                 'recent_gas': recent_gas(),
