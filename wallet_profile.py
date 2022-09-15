@@ -220,8 +220,8 @@ def walletProfile(wallet_address, network, coin_price):
     # Report analytic
     report_analytic(network, wallet_address, display_name)
 
-    return {'walletProfile': {
-        'walletProfile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
+    return {'wallet_profile': {
+        'wallet_profile': {'display_name': display_name, 'legal_name': legal_name, 'account_index': account_index,
                            'role': role,
                            'email': email, 'twitter': twitter, 'website': website, 'riot': riot, 'identity': identity,
                            'judgements': judgements, 'sub': sub,
