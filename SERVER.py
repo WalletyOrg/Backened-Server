@@ -56,7 +56,7 @@ def data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, ra
             'transfers': transfers[0],
             'monthly_transfers': monthly_transfers[0],
             'paper_diamond_handed': paper_diamond_handed,
-            'currentDates': current_dates,
+            'current_dates': current_dates,
             'unique_wallets': unique_wallets,
             'raw_transfers': raw_transfers,
             'chain_state': chain_state}
@@ -160,15 +160,15 @@ def kusama_request_page():
 # Polkadot ##########################################################################################################################################################
 @app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
 def polkadot_request_page():
-    # try:
+    try:
         wallet_address = str(request.args.get('wallet_address'))
         network = 'polkadot'
         coin_price = decimal.Decimal(coinPrice(network))
         json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
         return json_data
-    # except:
-    #     return {'wallety.org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
-    #
+    except:
+        return {'wallety.org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+
 
 
 

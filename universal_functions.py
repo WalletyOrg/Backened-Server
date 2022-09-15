@@ -281,9 +281,7 @@ def walletCheck(wallet_address, specified_network):
     def network_check(network, wallet_address):
         url = f"https://{network}.api.subscan.io/api/v2/scan/search"
         payload = json.dumps({"key": wallet_address})
-        headers = {
-            'Content-Type': 'application/json',
-            'X-API-Key': subscan_api_key}
+        headers = {'Content-Type': 'application/json', 'X-API-Key': subscan_api_key}
         response = requests.request("POST", url, headers=headers, data=payload).text
         response = json.loads(response)
         network_response = False
