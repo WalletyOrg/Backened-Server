@@ -17,7 +17,7 @@ temp_testing.py
 Ignore_testing/server_testing.py
 server_testing.py
 away_server_testing.py
-local_server_testing.py
+Server testing/local_server_testing.py
 testing.py
 user_key_check.py
 key_check.py
