@@ -147,27 +147,31 @@ def apiApply():
 
 # Data server ###############################################################################################################################################################
 # Kusama ##########################################################################################################################################################
-@app.route('/kusama/', methods=['GET']) # http://127.0.0.1:7777/kusama/?wallet_address=
+@app.route('/kusama/', methods=['GET']) # https://127.0.0.1:7777/kusama/?wallet_address=
 def kusama_request_page():
     try:
         wallet_address = str(request.args.get('wallet_address'))
         network = 'kusama'
         coin_price = decimal.Decimal(coinPrice(network))
-        json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
+        json_data = json.dumps(data(wallet_address=wallet_address, wallet_profile=walletProfile, current_dates=currentDates,
+                                    paper_diamond_handed=paperDiamondHanded, raw_transfers=rawTransfers,
+                                    chain_state=chainState, coin_price=coin_price, network=network))
         return json_data
     except:
         return {'wallety_org_kusama_server_status': 500, 'response': 'internal server error, please try again later'}
 # Polkadot ##########################################################################################################################################################
-@app.route('/polkadot/', methods=['GET']) # http://127.0.0.1:7777/polkadot/?wallet_address=
+@app.route('/polkadot/', methods=['GET']) # https://127.0.0.1:7777/polkadot/?wallet_address=
 def polkadot_request_page():
-    try:
+    # try:
         wallet_address = str(request.args.get('wallet_address'))
         network = 'polkadot'
         coin_price = decimal.Decimal(coinPrice(network))
-        json_data = json.dumps(data(wallet_address, walletProfile, currentDates, paperDiamondHanded, rawTransfers, chainState, coin_price, network))
+        json_data = json.dumps(data(wallet_address=wallet_address, wallet_profile=walletProfile, current_dates=currentDates,
+                                    paper_diamond_handed=paperDiamondHanded, raw_transfers=rawTransfers, chain_state=chainState,
+                                    coin_price=coin_price, network=network))
         return json_data
-    except:
-        return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+    # except:
+    #     return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
 
 
 

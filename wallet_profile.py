@@ -1,3 +1,5 @@
+import time
+
 import requests
 import json
 from keys import *
@@ -139,6 +141,7 @@ def walletProfile(wallet_address, network, coin_price):
         json_data = {}
         response = requests.post(f'https://{network}.api.subscan.io/api/scan/staking/validators', headers=headers, json=json_data).text
         response = json.loads(response)
+        time.sleep(1)
         response = response['data']['list']
 
         current_validators = []
