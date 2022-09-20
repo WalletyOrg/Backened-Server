@@ -162,7 +162,7 @@ def kusama_request_page():
 # Polkadot ##########################################################################################################################################################
 @app.route('/polkadot/', methods=['GET']) # https://127.0.0.1:7777/polkadot/?wallet_address=
 def polkadot_request_page():
-    # try:
+    try:
         wallet_address = str(request.args.get('wallet_address'))
         network = 'polkadot'
         coin_price = decimal.Decimal(coinPrice(network))
@@ -170,8 +170,8 @@ def polkadot_request_page():
                                     paper_diamond_handed=paperDiamondHanded, raw_transfers=rawTransfers, chain_state=chainState,
                                     coin_price=coin_price, network=network))
         return json_data
-    # except:
-    #     return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
+    except:
+        return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
 
 
 
