@@ -78,11 +78,7 @@ from flask_cors import CORS
 from flask import *
 app = Flask(__name__)
 CORS(app)
-cors = CORS(app, resources={
-    r"/*": {
-        "origins": "*"
-    }
-})
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 # SERVER ###########################################################################################################################################################
 # Home #############################################################################################################################################################
 @app.route('/', methods=['GET'])
@@ -172,36 +168,25 @@ def polkadot_request_page():
         return json_data
     except:
         return {'wallety_org_polkadot_server_status': 500, 'response': 'internal server error, please try again later'}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# custom kusama data ####################################################################################################################################################
-@app.route('/kusama/customdata/', methods=['GET'])
-def kusama_custom_data():
+# custom data ####################################################################################################################################################
+@app.route('/customdata/', methods=['GET'])
+def custom_data():
     try:
         wallet_address = str(request.args.get('wallet_address'))
         custom_to = str(request.args.get('to'))
         custom_from = str(request.args.get('from'))
         network = str(request.args.get('network'))
+
         coin_price = decimal.Decimal(coinPrice(network))
 
-        all_transfers_custom = getTransfers(wallet_address, network, coin_price=coin_price)[1]
-        custom_data = customTransfers(all_transfers_custom, wallet_address, custom_to, custom_from, coin_price=coin_price, network=network)
-        custom_top_accounts = customUniqueWallets(wallet_address, custom_data[2], custom_data[1], custom_data[3], coin_price=coin_price, network=network)
+        all_transfers_custom = getTransfers(wallet_address=wallet_address, network=network, coin_price=coin_price)[1]
+        custom_data = customTransfers(all_transfers=all_transfers_custom, wallet_address=wallet_address,
+                                      custom_to=custom_to, custom_from=custom_from,
+                                      coin_price=coin_price, network=network)
+        custom_top_accounts = customUniqueWallets(wallet_address=wallet_address, custom_deposits=custom_data[2],
+                                                  custom_withdrawals=custom_data[1], custom_transactions=custom_data[3],
+                                                  coin_price=coin_price, network=network)
+
         return_custom = {'custom_data_total': custom_data[0]['custom_total'],
                          'custom_data_withdrawals': custom_data[0]['custom_withdrawal'],
                          'custom_data_deposits': custom_data[0]['custom_deposit'],
@@ -211,12 +196,6 @@ def kusama_custom_data():
         return json_data
     except:
         return {'wallety_org_custom_data_server_status': 500, 'response': 'internal server error, please try again later'}
-
-
-
-
-
-
 # general ##########################################################################################################################################################
 @app.route('/general/', methods=['GET'])
 def general():
@@ -230,5 +209,3 @@ def general():
 # RUN SERVER ##############################################################################################################################################################
 if __name__ == '__main__':
     app.run(port=7777)
-
-
