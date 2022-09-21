@@ -318,6 +318,17 @@ def coinPrice(network):
     price_req = requests.get(f'https://api.coingecko.com/api/v3/coins/{network}').text
     price_req = json.loads(price_req)
     price_req = price_req['market_data']['current_price']['usd']
+    price_req = decimal.Decimal(price_req)
     return price_req
+
+
+
+
+
+def getCurrencyVal(coins, COIN_PRICE):
+    coins = float(coins)
+    coins = coins * COIN_PRICE
+    return coins
+
 
 
