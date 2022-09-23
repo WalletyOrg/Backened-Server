@@ -71,6 +71,7 @@ def data(wallet_address, wallet_profile, current_dates, paper_diamond_handed, ra
 
 
 
+
 # SERER SETUP #######################################################################################################################################################
 # The whole server
 from json import dumps
