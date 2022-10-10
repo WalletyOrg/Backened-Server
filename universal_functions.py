@@ -331,4 +331,3 @@ def getCurrencyVal(coins, COIN_PRICE):
     return coins
 
 
-
